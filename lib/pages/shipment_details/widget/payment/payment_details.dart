@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:golden_path_gate_admin_portal/localization/AppLocal.dart';
 import 'package:golden_path_gate_admin_portal/models/payment.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_details/shipment_details_provider.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_details/widget/payment/payment_provider.dart';
@@ -76,15 +77,14 @@ class _PaymentDetailsWidgetState extends State<PaymentDetailsWidget> {
 
                               },
                               child: FormInputContainer(
-                                  title: "Payment Date",
+                                  title: AppLocalizations.of(context).trans("paymentDate"),
                                   child: FormWidgetContainer(
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 12
                                         ),
-                                        child:
-                                        Text(
-                                          _selectedDate == null ? "Click to select" :  dateFormatter.format(_selectedDate!),
+                                        child: Text(
+                                          _selectedDate == null ? AppLocalizations.of(context).trans("clickToSelect") :  dateFormatter.format(_selectedDate!),
                                           style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                               fontSize: 12
@@ -96,15 +96,12 @@ class _PaymentDetailsWidgetState extends State<PaymentDetailsWidget> {
                             ),
                             const SizedBox(width: 8,),
                             FormInputContainer(
-                                title: "Payment done?",
+                                title: AppLocalizations.of(context).trans("paymentDone"),
                                 child: Switch.adaptive(
                                     value: _isPayed,
                                     onChanged: (value){
                                       _isPayed = value;
                                       _checkChanges();
-                                      // if(_isPayed){
-                                      //   PODDialog.show(context);
-                                      // }
                                     }
                                 )
                             ),
@@ -146,7 +143,7 @@ class _PaymentDetailsWidgetState extends State<PaymentDetailsWidget> {
                                 ),
                               ):
                           Text(
-                            "Update",
+                            AppLocalizations.of(context).trans("update"),
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -157,17 +154,17 @@ class _PaymentDetailsWidgetState extends State<PaymentDetailsWidget> {
                     ],
                   ),
                   FormInputContainer(
-                    title: 'Payment note',
+                    title: AppLocalizations.of(context).trans("paymentNote"),
                     child: TextFormField(
                       controller: _shipmentNoteController,
-                      decoration: AppTheme.getInputDecoration(hint: 'Payment note'),
+                      decoration: AppTheme.getInputDecoration(context,hint: AppLocalizations.of(context).trans("paymentNote")),
                       maxLines: 3,
                       cursorHeight: 16,
                       cursorWidth: 2,
                       onChanged: (val){
                         _checkChanges();
                       },
-                      validator: (value) => value == null || value.isEmpty ? 'Please enter shipping line name' : null,
+                      // validator: (value) => value == null || value.isEmpty ? 'Please enter shipping line name' : null,
                     ),
                   ),
                 ],

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:golden_path_gate_admin_portal/models/payment.dart';
+import 'package:golden_path_gate_admin_portal/models/shipment_status.dart';
 import 'package:intl/intl.dart' as intl;
 
 class TransportType {
@@ -29,15 +30,15 @@ class PackagingType {
   static List<String> values = [cartoons, pallets, pieces];
 }
 
-class ShipmentServiceType {
-  static String portToPort = 'Port to Port';
-  static String warehouseToPort = 'Warehouse to Port';
-  static List<String> values = [portToPort, warehouseToPort];
-}
+// class ShipmentServiceType {
+//   static String portToPort = 'Port to Port';
+//   static String warehouseToPort = 'Warehouse to Port';
+//   static List<String> values = [portToPort, warehouseToPort];
+// }
 
-enum ShipmentStatus {
-  start,preparing,packaging,delivery,delivered,cancelled
-}
+// enum ShipmentStatus {
+//   start,preparing,packaging,delivery,delivered,cancelled
+// }
 
 class ShipmentDimension {
   final double? l, w, h;
@@ -96,7 +97,7 @@ class ShipmentCreateModel {
   final String? receiverInfo;
   final String? shippingCompany;
   final String? shipmentLoadType;
-  final String? shipmentServiceType;
+  final int? shipmentServiceType;
   final String? packagingType;
   final int? piecesCount;
   final double? grossWeight;
@@ -153,7 +154,7 @@ class ShipmentCreateModel {
       "dimensions": dimensions.map((e){return e.toMap;}).toList(),
       "note": note,
       "createdAt": FieldValue.serverTimestamp(),
-      "status": 'start',
+      "status": 0,
       "customerName": customerName,
       "customerId": customerId
       // "statusHistory":{
@@ -173,7 +174,7 @@ class Shipment {
   final String? receiverInfo;
   final String? shippingCompany;
   final String? shipmentLoadType;
-  final String? shipmentServiceType;
+  final int? shipmentServiceType;
   final String? packagingType;
   final int? piecesCount;
   final double? grossWeight;
@@ -184,10 +185,14 @@ class Shipment {
   final String note;
   final DateTime createdAt;
   final String formatedDatetime;
-  final ShipmentStatus status;
+  final int status;
   final String customerName;
   final String customerId;
   final ShipmentPayment? payment;
+  final String? origin;
+  final DateTime? pickupDate;
+  final String? hub;
+  final String? destinationPort;
   // final List<ShipmentStatusHistory> statusHistory;
 
 
@@ -213,38 +218,46 @@ class Shipment {
     required this.note,
     required this.customerId,
     required this.customerName,
-    this.payment
+    this.payment,
+    this.destinationPort,
+    this.origin,
+    this.pickupDate,
+    this.hub
     // required this.statusHistory
   });
 
   factory Shipment.fromDoc(DocumentSnapshot doc){
     final data = doc.data() as Map<String,dynamic>;
     return Shipment(
-        uid: doc.id,
-        shipmentTransportType: data['shipmentTransportType'],
-        shipmentNumber: data['shipmentNumber'],
-        senderInfo: data['senderInfo'],
-        receiverInfo: data['receiverInfo'],
-        shippingCompany: data['shippingCompany'],
-        shipmentLoadType: data['shipmentLoadType'],
-        shipmentServiceType: data['shipmentServiceType'],
-        packagingType: data['packagingType'],
-        piecesCount: data['piecesCount'],
-        grossWeight: data['grossWeight'],
-        chargeableWeight: data['chargeableWeight'],
-        cbm: data['cbm'],
-        dimensions: ((data['dimensions']??[])as List)
-            .map<ShipmentDimension>((element){
-              return ShipmentDimension.fromMap(element);
-            }).toList(),
-        note: data['note'] ?? "",
-        hsCodes: (data['hsCode'] as List).map((e){return e.toString();}).toList(),
-        createdAt: (data['createdAt'] as Timestamp).toDate(),
-        formatedDatetime: intl.DateFormat('d-MMM-y').format((data['createdAt'] as Timestamp).toDate()),
-        status: ShipmentStatus.values.firstWhere((element){return element.name == data['status'];}),
-        customerName: data['customerName'],
-        customerId: data['customerId'],
-        payment: data['payment'] == null ? null : ShipmentPayment.fromDoc(data['payment'])
+      uid: doc.id,
+      shipmentTransportType: data['shipmentTransportType'],
+      shipmentNumber: data['shipmentNumber'],
+      senderInfo: data['senderInfo'],
+      receiverInfo: data['receiverInfo'],
+      shippingCompany: data['shippingCompany'],
+      shipmentLoadType: data['shipmentLoadType'],
+      shipmentServiceType: data['shipmentServiceType'],
+      packagingType: data['packagingType'],
+      piecesCount: data['piecesCount'],
+      grossWeight: data['grossWeight'],
+      chargeableWeight: data['chargeableWeight'],
+      cbm: data['cbm'],
+      dimensions: ((data['dimensions']??[])as List)
+          .map<ShipmentDimension>((element){
+            return ShipmentDimension.fromMap(element);
+          }).toList(),
+      note: data['note'] ?? "",
+      hsCodes: (data['hsCode'] as List).map((e){return e.toString();}).toList(),
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      formatedDatetime: intl.DateFormat('d-MMM-y').format((data['createdAt'] as Timestamp).toDate()),
+      status: data['status'],//ShipmentStatusModel(data['status'], data['statusName']),// ShipmentStatus.values.firstWhere((element){return element.name == data['status'];}),
+      customerName: data['customerName'],
+      customerId: data['customerId'],
+      payment: data['payment'] == null ? null : ShipmentPayment.fromDoc(data['payment']),
+      origin: data['origin'],
+      destinationPort: data['destinationPort'],
+      hub: data['hub'],
+      pickupDate: data['pickupDate'] == null ? null : (data['pickupDate'] as Timestamp).toDate()
     );
   }
 
@@ -253,7 +266,7 @@ class Shipment {
     return 'Shipment(transportType: $shipmentTransportType, number: $shipmentNumber, senderInfo: $senderInfo, receiverInfo: $receiverInfo, shippingCompany: $shippingCompany, loadType: $shipmentLoadType, packagingType: $packagingType, piecesCount: $piecesCount, grossWeight: $grossWeight, chargeableWeight: $chargeableWeight, cbm: $cbm)';
   }
 
-  Map<String, dynamic> get toMap {
+  /*Map<String, dynamic> get toMap {
     return {
       "shipmentNumber": shipmentNumber,
       "shipmentTransportType": shipmentTransportType,
@@ -269,18 +282,18 @@ class Shipment {
       "hsCode": hsCodes,
       "dimensions": dimensions.map((e){return e.toMap;}).toList(),
     };
-  }
+  }*/
 }
 
 class ShipmentStatusHistory {
-  String name;
+  // String name;
   DateTime createdAt;
   String formatedCreatedAt;
   String note;
-  ShipmentStatus status;
+  int status;
 
   ShipmentStatusHistory({
-    required this.name,
+    // required this.name,
     required this.createdAt,
     required this.formatedCreatedAt,
     required this.note,
@@ -288,24 +301,24 @@ class ShipmentStatusHistory {
   });
 
   factory ShipmentStatusHistory.fromMap(Map<String,dynamic> data) {
-    print(data['name']);
     return ShipmentStatusHistory(
-      name: data['name'],
+      // name: data['name'],
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       formatedCreatedAt: intl.DateFormat('d-MMM-y').format((data['createdAt'] as Timestamp).toDate()),
       note: data['note'] ?? '',
-      status: ShipmentStatus.values.firstWhere((e) => e.name == data['name'])
+      status: data['status']//ShipmentStatus.values.firstWhere((e) => e.name == data['name'])
     );
   }
 
 }
 
 class ShipmentUpdateModel {
+  final Shipment shipment;
   final String? senderInfo;
   final String? receiverInfo;
   final String? shippingCompany;
   final String? shipmentLoadType;
-  final String? shipmentServiceType;
+  final int? shipmentServiceType;
   final String? packagingType;
   final int? piecesCount;
   final double? grossWeight;
@@ -314,9 +327,13 @@ class ShipmentUpdateModel {
   final List<String>? hsCodes;
   final List<ShipmentDimension>? dimensions;
   final String? note;
-
+  final String? origin;
+  final DateTime? pickupDate;
+  final String? hub;
+  final String? destinationPort;
 
   ShipmentUpdateModel({
+    required this.shipment,
     required this.senderInfo,
     required this.receiverInfo,
     required this.shippingCompany,
@@ -330,38 +347,52 @@ class ShipmentUpdateModel {
     required this.dimensions,
     required this.hsCodes,
     required this.note,
+    required this.destinationPort,
+    required this.hub,
+    required this.origin,
+    required this.pickupDate
   });
-
-
 
   Map<String, dynamic> get toMap {
     return {
-      if(senderInfo != null)
+      if(senderInfo != shipment.senderInfo)
         "senderInfo": senderInfo,
-      if(receiverInfo != null)
+      if(receiverInfo != shipment.receiverInfo)
         "receiverInfo": receiverInfo,
-      if(shippingCompany != null)
+      if(shippingCompany != shipment.shippingCompany)
         "shippingCompany": shippingCompany,
-      if(shipmentLoadType != null)
+      if(shipmentLoadType != shipment.shipmentLoadType)
         "shipmentLoadType": shipmentLoadType,
-      if(shipmentServiceType != null)
+      if(shipmentServiceType != shipment.shipmentServiceType)
         "shipmentServiceType": shipmentServiceType,
-      if(packagingType != null)
+      if(packagingType != shipment.packagingType)
         "packagingType": packagingType,
-      if(piecesCount != null)
+      if(piecesCount != shipment.piecesCount)
         "piecesCount": piecesCount,
-      if(grossWeight != null)
+      if(grossWeight != shipment.grossWeight)
         "grossWeight": grossWeight,
-      if(chargeableWeight != null)
+      if(chargeableWeight != shipment.chargeableWeight)
         "chargeableWeight": chargeableWeight,
-      if(cbm != null)
+      if(cbm != shipment.cbm)
         "cbm": cbm,
       if(hsCodes != null)
         "hsCode": hsCodes,
       if(dimensions != null)
         "dimensions": dimensions?.map((e){return e.toMap;}).toList(),
-      if(note != null)
-        "note": note
+      if((note??"") != shipment.note)
+        "note": note,
+
+
+      if(pickupDate != shipment.pickupDate)
+        "pickupDate": pickupDate,
+      if((origin??"") != shipment.origin)
+        "origin": origin,
+      if((destinationPort??"") != shipment.destinationPort)
+        "destinationPort": destinationPort,
+      if( (hub??"") != shipment.hub)
+        "hub": hub,
+
+
     };
   }
 }

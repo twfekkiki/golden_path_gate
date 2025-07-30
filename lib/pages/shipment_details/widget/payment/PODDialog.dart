@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:golden_path_gate_admin_portal/constants.dart';
+import 'package:golden_path_gate_admin_portal/localization/AppLocal.dart';
 
 class PODDialog extends StatelessWidget {
   const PODDialog({super.key});
@@ -36,7 +37,7 @@ class PODDialog extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  "Upload POD",
+                  AppLocalizations.of(context).trans("uploadPOD"),
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -49,7 +50,7 @@ class PODDialog extends StatelessWidget {
             ElevatedButton(
                 onPressed: (){
                   Navigator.of(context).pop();
-                  // context.go('/shipments-list/details/ABC537764233');
+                  // context.go('/shipment-list/details/ABC537764233');
                 },
                 style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
@@ -60,7 +61,7 @@ class PODDialog extends StatelessWidget {
                     )
                 ),
                 child: Text(
-                  "Submit",
+                  AppLocalizations.of(context).trans("submit"),
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -68,7 +69,6 @@ class PODDialog extends StatelessWidget {
                   ),
                 )
             ),
-
           ],
         ),
       ),

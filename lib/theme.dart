@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'constants.dart';
 
 class AppTheme {
-  static  InputDecoration getInputDecoration({String? hint}) {
+  static  InputDecoration getInputDecoration(BuildContext context,{String? hint}) {
     return InputDecoration(
       hintText: hint,
       hintStyle: TextStyle(
@@ -13,28 +13,28 @@ class AppTheme {
       border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(kCornerRadius),
           borderSide: BorderSide(
-              color: Colors.black12,
+              color: Theme.of(context).brightness == Brightness.light ? Colors.black12 : Colors.white12,
               width: 0.8
           )
       ),
       enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(kCornerRadius),
           borderSide: BorderSide(
-              color: Colors.black12,
+              color: Theme.of(context).brightness == Brightness.light ? Colors.black12 : Colors.white12,
               width: 0.8
           )
       ),
       disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(kCornerRadius),
           borderSide: BorderSide(
-              color: Colors.black12,
+              color: Theme.of(context).brightness == Brightness.light ? Colors.black12 : Colors.white12,
               width: 0.8
           )
       ),
       focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(kCornerRadius),
           borderSide: BorderSide(
-              color: AppColors.primary,
+              color: Theme.of(context).brightness == Brightness.light ? Colors.black12 : Colors.white12,
               width: 0.8
           )
       ),

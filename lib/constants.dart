@@ -10,6 +10,13 @@ class AppColors {
 
 }
 
+class AppLang {
+  static String en = "en";
+  static String ar = "ar";
+
+  static List<String> values = [en,ar];
+
+}
 
 const double kSmallSize = 420;
 const double kMidSize = 620;

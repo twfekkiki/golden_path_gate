@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:golden_path_gate_admin_portal/constants.dart';
+import 'package:golden_path_gate_admin_portal/localization/AppLocal.dart';
 
 class AppDrawer extends StatefulWidget {
   final bool opened;
@@ -32,7 +33,9 @@ class _AppDrawerState extends State<AppDrawer> {
         key: ValueKey('DrawerOpened'),
         width: 300,
         decoration: BoxDecoration(
-            color: AppColors.primary,
+            color: Theme.of(context).brightness == Brightness.light ?
+            Theme.of(context).primaryColor:
+            Colors.grey.shade900,
             borderRadius: BorderRadius.circular(kCornerRadius),
             boxShadow: [
               BoxShadow(
@@ -75,55 +78,51 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
             DrawerItem(
               iconData: Icons.local_shipping_outlined,
-              title: 'Create Shipment',
+              title: AppLocalizations.of(context).trans("createShipment"),
               selected: widget.selectedIndex == 0,
               onCLick: () {
-                // setState(() {
-                //   selectedPage = 0;
-                // });
-                print("Hello");
                 widget.onChange(0);
                 GoRouter.of(context).go('/create-shipment');
-
               },
             ),
             const SizedBox(height: 12,),
             DrawerItem(
               iconData: Icons.list_alt,
-              title: 'Shipments List',
+              title: AppLocalizations.of(context).trans("shipmentsList"),
               selected: widget.selectedIndex == 1,
               onCLick: () {
-                // setState(() {
-                //   selectedPage = 1;
-                // });
-                GoRouter.of(context).go('/shipments-list');
+                GoRouter.of(context).go('/shipment-list');
                 widget.onChange(1);
               },
             ),
             const SizedBox(height: 12,),
             DrawerItem(
               iconData: Icons.people_outline,
-              title: 'Customers List',
+              title: AppLocalizations.of(context).trans("customerList"),
               selected: widget.selectedIndex == 2,
               onCLick: () {
-                // setState(() {
-                //   selectedPage = 2;
-                // });
-                GoRouter.of(context).go('/customers-list');
+                GoRouter.of(context).go('/customer-list');
                 widget.onChange(2);
               },
             ),
             const SizedBox(height: 12,),
             DrawerItem(
               iconData: Icons.settings,
-              title: 'Settings',
+              title: AppLocalizations.of(context).trans("settings"),
               selected: widget.selectedIndex == 3,
               onCLick: () {
-                // setState(() {
-                //   selectedPage = 3;
-                // });
-                //GoRouter.of(context).push('shipments-list');
-                //widget.onChange(3);
+                GoRouter.of(context).go('/settings');
+                widget.onChange(3);
+              },
+            ),
+            const SizedBox(height: 12,),
+            DrawerItem(
+              iconData: Icons.person_2,
+              title: AppLocalizations.of(context).trans("userList"),
+              selected: widget.selectedIndex == 4,
+              onCLick: () {
+                GoRouter.of(context).go('/user-list');
+                widget.onChange(4);
               },
             ),
             const SizedBox(height: 12,),
@@ -134,7 +133,9 @@ class _AppDrawerState extends State<AppDrawer> {
         key: ValueKey('DrawerClosed'),
         width: 100,
         decoration: BoxDecoration(
-            color: AppColors.primary,
+            color: Theme.of(context).brightness == Brightness.light ?
+            Theme.of(context).primaryColor:
+            Colors.grey.shade900,
             borderRadius: BorderRadius.circular(kCornerRadius),
             boxShadow: [
               BoxShadow(
@@ -197,7 +198,7 @@ class _AppDrawerState extends State<AppDrawer> {
               selected: widget.selectedIndex == 1,
               isSmall: true,
               onCLick: () {
-                GoRouter.of(context).go('/shipments-list');
+                GoRouter.of(context).go('/shipment-list');
               },
             ),
             const SizedBox(height: 12,),
@@ -207,7 +208,7 @@ class _AppDrawerState extends State<AppDrawer> {
               selected: widget.selectedIndex == 2,
               isSmall: true,
               onCLick: () {
-                GoRouter.of(context).go('/customers-list');
+                GoRouter.of(context).go('/customer-list');
               },
             ),
             const SizedBox(height: 12,),
@@ -217,10 +218,21 @@ class _AppDrawerState extends State<AppDrawer> {
               selected: widget.selectedIndex == 3,
               isSmall: true,
               onCLick: () {
-
+                GoRouter.of(context).go('/settings');
               },
             ),
             const SizedBox(height: 12,),
+            DrawerItem(
+              iconData: Icons.person_2,
+              title: 'Settings',
+              selected: widget.selectedIndex == 4,
+              isSmall: true,
+              onCLick: () {
+                GoRouter.of(context).go('/user-list');
+              },
+            ),
+            const SizedBox(height: 12,),
+
           ],
         ),
       ),
@@ -349,8 +361,8 @@ class _DrawerItemState extends State<DrawerItem> {
 
   @override
   Widget build(BuildContext context) {
-    Color foregroundColor = AppColors.primary;
-    Color backgroundColor = Colors.white;
+    Color foregroundColor = Theme.of(context).primaryColor;
+    Color backgroundColor = Theme.of(context).cardColor;
 
     if (widget.selected) {
       foregroundColor = Colors.white;

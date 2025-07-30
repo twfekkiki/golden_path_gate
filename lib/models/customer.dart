@@ -1,5 +1,3 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Customer {
@@ -7,16 +5,18 @@ class Customer {
   final String userName;
   final String firstName;
   final String lastName;
+  final String? companyName;
   final String phone;
-  final String email;
+  final String? email;
   final String password;
 
   Customer({
     required this.uid,
     required this.firstName,
     required this.lastName,
+    this.companyName,
     required this.phone,
-    required this.email,
+    this.email,
     required this.userName,
     required this.password
   });
@@ -28,10 +28,11 @@ class Customer {
         uid: doc.id,
         firstName: data['firstName'],
         lastName: data['lastName'],
+        companyName: data['companyName'],
         phone: data['phone'],
         email: data['email'],
         userName: data['userName'],
-        password: ''
+        password: data['password']??""
     );
   }
 
@@ -40,8 +41,14 @@ class Customer {
     "firstName": firstName,
     "lastName": lastName,
     "phone": phone,
-    "email": email,
+    if(email != null)
+      "email": email,
     "userName": userName,
+    if(email != null)
+      "companyName": companyName,
+    if(uid.isEmpty)
+      "createdAt": FieldValue.serverTimestamp(),
+    "password":password
   };
 
 

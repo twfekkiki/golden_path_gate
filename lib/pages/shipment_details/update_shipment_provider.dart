@@ -2,11 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:golden_path_gate_admin_portal/models/shipment.dart';
 
-class UpdateShipmentDetails extends ChangeNotifier {
+class UpdateShipmentDetailsProvider extends ChangeNotifier {
 
   final String uid;
 
-  UpdateShipmentDetails(this.uid);
+  UpdateShipmentDetailsProvider(this.uid);
 
   bool loading = false;
   bool done = false;

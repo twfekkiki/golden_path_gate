@@ -22,9 +22,9 @@ class CreateShipmentProvider extends ChangeNotifier {
       await shipmentsCollection.doc(result.id)
           .collection("statusHistory").add(
           {
-            'name':'start',
-            'note':shipment.note,
-            'createdAt':FieldValue.serverTimestamp()
+            'status': 0,
+            'note': shipment.note,
+            'createdAt': FieldValue.serverTimestamp()
           }
       );
       done = true;

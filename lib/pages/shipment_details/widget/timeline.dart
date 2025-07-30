@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:golden_path_gate_admin_portal/constants.dart';
+import 'package:golden_path_gate_admin_portal/localization/AppLocal.dart';
 import 'package:golden_path_gate_admin_portal/models/shipment.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_details/shipment_details_provider.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_details/widget/timeline_provider.dart';
+import 'package:golden_path_gate_admin_portal/services/app_info_service.dart';
 import 'package:provider/provider.dart';
 import 'package:timelines_plus/timelines_plus.dart';
 
@@ -22,6 +24,8 @@ class ProcessTimelineWidget extends StatefulWidget {
 class ProcessTimelineWidgetState extends State<ProcessTimelineWidget> {
 
   late TimelineProvider timelineProvider;
+
+  final AppInfoService _appInfoService = AppInfoService();
 
   @override
   void initState() {
@@ -64,7 +68,6 @@ class ProcessTimelineWidgetState extends State<ProcessTimelineWidget> {
                 padding: const EdgeInsets.only(top: 20.0),
                 builder: TimelineTileBuilder.connected(
                   indicatorBuilder: (context, index) {
-                    final status = ShipmentStatus.values[index];
                     return OutlinedDotIndicator(
                       color: index <= _processIndex
                           ? const Color(0xff6ad192)
@@ -91,7 +94,8 @@ class ProcessTimelineWidgetState extends State<ProcessTimelineWidget> {
                        crossAxisAlignment: CrossAxisAlignment.start,
                        children: [
                          Text(
-                           ShipmentStatus.values[index].name.toUpperCase(),
+                           _appInfoService.getStatusName(_appInfoService.status![index].index),
+                           // AppLocalizations.of(context).trans(ShipmentStatus.values[index].name).toUpperCase(),
                            style: TextStyle(
                              fontSize: 16,
                              color: index < _processIndex ?
@@ -131,7 +135,7 @@ class ProcessTimelineWidgetState extends State<ProcessTimelineWidget> {
                      ),
                    );
                   },
-                  itemCount: statusHistory.length < ShipmentStatus.values.length ? statusHistory.length  + 1  : statusHistory.length,
+                  itemCount: statusHistory.length < _appInfoService.status!.length ? statusHistory.length  + 1  : statusHistory.length,
                 ),
               ),
               const SizedBox(height: 8,),
@@ -164,7 +168,7 @@ class ProcessTimelineWidgetState extends State<ProcessTimelineWidget> {
                         size: 20,
                         color: Colors.white,
                       ) : Text(
-                        "Update Stage",
+                        AppLocalizations.of(context).trans("updateStage"),
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,

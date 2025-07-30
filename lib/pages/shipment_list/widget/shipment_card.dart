@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:golden_path_gate_admin_portal/constants.dart';
+import 'package:golden_path_gate_admin_portal/localization/AppLocal.dart';
 import 'package:golden_path_gate_admin_portal/models/shipment.dart';
+import 'package:golden_path_gate_admin_portal/services/app_info_service.dart';
 
 class ShipmentCard extends StatefulWidget {
   final Shipment? shipment;
@@ -14,8 +16,11 @@ class ShipmentCard extends StatefulWidget {
 class _ShipmentCardState extends State<ShipmentCard> {
   bool hovered = false;
 
+
+  final AppInfoService _appInfoService = AppInfoService();
   @override
   Widget build(BuildContext context) {
+
     return MouseRegion(
       onEnter: (value){
         setState(() {
@@ -41,12 +46,12 @@ class _ShipmentCardState extends State<ShipmentCard> {
             child: Wrap(
               runSpacing: 12,
               children: [
-                CardItem(title: 'Shipment Number', value: widget.shipment!.shipmentNumber,),
-                CardItem(title: 'Customer Name', value: widget.shipment!.customerName,),
-                CardItem(title: 'Shipment Status', value: widget.shipment!.status.name.toUpperCase(),),
-                CardItem(title: 'Created at', value: widget.shipment!.formatedDatetime,),
-                CardItem(title: 'Modified at', value: '25/6/2025',),
-                CardItem(title: 'Shipment Transport', value: widget.shipment!.shipmentTransportType,),
+                CardItem(title: AppLocalizations.of(context).trans("shipmentNumber"), value: widget.shipment!.shipmentNumber,),
+                CardItem(title: AppLocalizations.of(context).trans("customerName"), value: widget.shipment!.customerName,),
+                CardItem(title: AppLocalizations.of(context).trans('shipmentStatus'), value: _appInfoService.getStatusName(widget.shipment!.status).toUpperCase(),),
+                CardItem(title: AppLocalizations.of(context).trans('createdAt'), value: widget.shipment!.formatedDatetime,),
+                CardItem(title: AppLocalizations.of(context).trans('modifiedAt'), value: '25/6/2025',),
+                CardItem(title: AppLocalizations.of(context).trans('shipmentTransport'), value: widget.shipment!.shipmentTransportType,),
               ],
             ),
           ),
@@ -65,7 +70,8 @@ class _ShipmentCardState extends State<ShipmentCard> {
                   vertical: 8
               ),
               child: Text(
-                widget.shipment!.status.name.toUpperCase(),
+                _appInfoService.getStatusName(widget.shipment!.status).toUpperCase(),
+                // AppLocalizations.of(context).trans(widget.shipment!.status.name).toUpperCase(),
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -80,7 +86,7 @@ class _ShipmentCardState extends State<ShipmentCard> {
               right: 4,
               child: ElevatedButton(
                   onPressed: (){
-                    context.go('/shipments-list/details/${widget.shipment!.uid}');
+                    context.go('/shipment-list/details/${widget.shipment!.uid}');
                   },
                   style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
@@ -91,7 +97,7 @@ class _ShipmentCardState extends State<ShipmentCard> {
                       )
                   ),
                   child: Text(
-                    "Details",
+                    AppLocalizations.of(context).trans("details"),
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -131,7 +137,7 @@ class CardItem extends StatelessWidget {
                   style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
-                      color: Colors.black
+                      // color: Colors.black
                   ),
                 ),
                 const SizedBox(height: 8,),
@@ -142,7 +148,7 @@ class CardItem extends StatelessWidget {
                   style: TextStyle(
                       fontWeight: FontWeight.normal,
                       fontSize: 14,
-                      color: Colors.black54
+                      // color: Colors.black54
                   ),
                 ),
               ],

@@ -21,7 +21,9 @@ class FormInputContainer extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: isMainTitle ? 18 : 14,
-            color: AppColors.primary
+            color:
+            Theme.of(context).brightness == Brightness.light?
+            Theme.of(context).primaryColor: Colors.white
           ),
         ),
         const SizedBox(height: 8,),

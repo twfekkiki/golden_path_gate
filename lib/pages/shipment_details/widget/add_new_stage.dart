@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:golden_path_gate_admin_portal/constants.dart';
-import 'package:golden_path_gate_admin_portal/models/shipment.dart';
+import 'package:golden_path_gate_admin_portal/localization/AppLocal.dart';
+import 'package:golden_path_gate_admin_portal/models/shipment_status.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_details/widget/timeline_provider.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_list/widget/filter_shipments.dart';
+import 'package:golden_path_gate_admin_portal/services/app_info_service.dart';
 
 class AddNewStageDialog extends StatefulWidget {
 
-  final ShipmentStatus current;
+  final int current;
 
-  static show(BuildContext context,ShipmentStatus current){
+  static show(BuildContext context,int current){
     return showDialog(context: context, builder: (context){
       return AddNewStageDialog(
         current: current,
@@ -24,8 +26,11 @@ class AddNewStageDialog extends StatefulWidget {
 
 class _AddNewStageDialogState extends State<AddNewStageDialog> {
 
-  String? status;
+  ShipmentStatusModel? status;
   String? note;
+
+  final AppInfoService _appInfoService = AppInfoService();
+
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +52,10 @@ class _AddNewStageDialogState extends State<AddNewStageDialog> {
                 onSubmit: (key , value ) {
                   status = value;
                 },
-                title: 'New stage',
+                title: AppLocalizations.of(context).trans("newStage"),
                 type: 'dropdown',
                 filterKey: 'shipmentNumber',
-                values: ShipmentStatus.values.sublist(widget.current.index + 1).map((e) => e.name).toList(),
+                values: _appInfoService.status!.sublist(widget.current + 1),//.map((e) => e.name).toList(),
               ),
             ),
             const SizedBox(height: 8,),
@@ -62,10 +67,10 @@ class _AddNewStageDialogState extends State<AddNewStageDialog> {
                 onSubmit: (key , value ) {
                   note = value;
                 },
-                title: 'Note',
+                title: AppLocalizations.of(context).trans('note'),
                 type: 'text-field',
                 filterKey: 'shipmentNumber',
-                hint: 'Your note',
+                hint: AppLocalizations.of(context).trans('yourNote'),
                 lines: 3,
                 //values: ['new','delivered','in-progress','delivery'],
               ),
@@ -78,8 +83,6 @@ class _AddNewStageDialogState extends State<AddNewStageDialog> {
                         ChangeStatusModel(status: status!, note: note??'')
                     );
                   }
-
-                  // context.go('/shipments-list/details/ABC537764233');
                 },
                 style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
@@ -90,7 +93,7 @@ class _AddNewStageDialogState extends State<AddNewStageDialog> {
                     )
                 ),
                 child: Text(
-                  "Add",
+                  AppLocalizations.of(context).trans('add'),
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -98,7 +101,6 @@ class _AddNewStageDialogState extends State<AddNewStageDialog> {
                   ),
                 )
             ),
-
           ],
         ),
       ),

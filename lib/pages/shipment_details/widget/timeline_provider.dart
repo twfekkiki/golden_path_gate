@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:golden_path_gate_admin_portal/models/shipment.dart';
+import 'package:golden_path_gate_admin_portal/models/shipment_status.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_details/change_shipment_status_provider.dart';
 
 class ChangeStatusModel {
-  final String status;
+  final ShipmentStatusModel status;
   final String note;
 
   ChangeStatusModel({
@@ -51,12 +52,12 @@ class TimelineProvider extends ChangeNotifier {
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         // 1. Update the shipment status
         transaction.update(docRef, {
-          'status': request.status,
+          'status': request.status.index,
         });
 
         // 2. Add new status history entry with server timestamp
         transaction.set(statusHistoryRef, {
-          'name': request.status,
+          'status': request.status.index,
           'createdAt': FieldValue.serverTimestamp(),
           'note': request.note,
         });

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:golden_path_gate_admin_portal/constants.dart';
+import 'package:golden_path_gate_admin_portal/localization/AppLocal.dart';
 import 'package:golden_path_gate_admin_portal/models/shipment.dart';
 import 'package:golden_path_gate_admin_portal/pages/widgets/FormInputContainer.dart';
+import 'package:golden_path_gate_admin_portal/services/app_info_service.dart';
 
 class FilterShipments extends StatefulWidget {
   const FilterShipments({super.key});
@@ -11,6 +13,10 @@ class FilterShipments extends StatefulWidget {
 }
 
 class _FilterShipmentsState extends State<FilterShipments> {
+
+  final AppInfoService _appInfoService = AppInfoService();
+
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -34,7 +40,7 @@ class _FilterShipmentsState extends State<FilterShipments> {
                 onSubmit: (key , value ) {
 
                 },
-                title: 'Shipment Number',
+                title: AppLocalizations.of(context).trans("shipmentNumber"),
                 type: 'text-field',
                 filterKey: 'shipmentNumber',
               ),
@@ -45,9 +51,9 @@ class _FilterShipmentsState extends State<FilterShipments> {
                 onSubmit: (key , value ) {
 
                 },
-                title: 'Transport type',
+                title: AppLocalizations.of(context).trans('transportType'),
                 type: 'dropdown',
-                filterKey: 'shipmentNumber',
+                filterKey: 'transportType',
                 values: TransportType.values,
               ),
             ),
@@ -57,10 +63,11 @@ class _FilterShipmentsState extends State<FilterShipments> {
                 onSubmit: (key , value ) {
 
                 },
-                title: 'Status',
+                title: AppLocalizations.of(context).trans("status"),
                 type: 'dropdown',
-                filterKey: 'shipmentNumber',
-                values: ['new','delivered','in-progress'],
+                filterKey: 'status',
+                values: _appInfoService.status!.map((e) => e.name).toList()
+                // ShipmentStatus.values.map((e) => e.name).toList(),
               ),
             )
           ],
@@ -71,11 +78,11 @@ class _FilterShipmentsState extends State<FilterShipments> {
 }
 
 class FilterItem extends StatefulWidget {
-  final Function(String,String) onSubmit;
+  final Function(String,dynamic) onSubmit;
   final String title;
   final String type;
   final String filterKey;
-  final List<String>? values;
+  final List<dynamic>? values;
   final String? hint;
   final int lines;
   const FilterItem({super.key, required this.onSubmit, required this.title, required this.type, required this.filterKey, this.values, this.hint, this.lines = 1});
@@ -85,7 +92,7 @@ class FilterItem extends StatefulWidget {
 }
 
 class _FilterItemState extends State<FilterItem> {
-  String? value;
+  dynamic value;
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +117,7 @@ class _FilterItemState extends State<FilterItem> {
     else if(widget.type == 'dropdown'){
       return FormInputContainer(
         title: widget.title,
-        child: DropdownButtonFormField<String>(
+        child: DropdownButtonFormField<dynamic>(
           value: value,
           decoration: InputDecoration(
             border: OutlineInputBorder(
@@ -154,7 +161,7 @@ class _FilterItemState extends State<FilterItem> {
               fontWeight: FontWeight.w400
           ),
           items: widget.values!
-              .map((type) => DropdownMenuItem(value: type, child: Text(type)))
+              .map((value) => DropdownMenuItem(value: value, child: Text(AppLocalizations.of(context).trans(value.toString()))))
               .toList(),
           onChanged: (val) {
             setState(() => value = val);

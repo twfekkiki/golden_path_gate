@@ -1,18 +1,27 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:golden_path_gate_admin_portal/app_theme.dart';
 import 'package:golden_path_gate_admin_portal/pages/MainAppWrapper.dart';
 import 'package:golden_path_gate_admin_portal/pages/auth/login_page.dart';
 import 'package:golden_path_gate_admin_portal/pages/customers/create_customer.dart';
 import 'package:golden_path_gate_admin_portal/pages/customers/customer_list.dart';
+import 'package:golden_path_gate_admin_portal/pages/settings/settings_page.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_details/shipment_details.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_list/shipment_list.dart';
+import 'package:golden_path_gate_admin_portal/pages/users/users_list.dart';
+import 'package:golden_path_gate_admin_portal/services/app_config_service.dart';
+import 'package:golden_path_gate_admin_portal/services/local_storage_service.dart';
 import 'package:provider/provider.dart';
 import 'auth_service.dart';
 import 'constants.dart';
 import 'firebase_options.dart';
+import 'localization/AppLocal.dart';
 import 'pages/create_shipment/create_shipment.dart';
+import 'pages/users/create_user/create_user_page.dart';
 
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
@@ -23,14 +32,13 @@ GlobalKey<NavigatorState>(debugLabel: 'shell');
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  print(FirebaseAuth.instance.currentUser);
-  //print(FirebaseAuth.instance.currentUser);
+  LocalStorageService.instance.init();
   runApp(
-      ChangeNotifierProvider.value(
-          value: AuthState(),
-          child: MyApp()
-      )
+      MyApp()
+      // ChangeNotifierProvider.value(
+      //     value: AuthState(),
+      //     child:
+      // )
   );
 }
 
@@ -52,7 +60,7 @@ class _MyAppState extends State<MyApp> {
       // refreshListenable: Provider.of<AuthState>(context),
       initialLocation:
       // FirebaseAuth.instance.currentUser == null ?
-      // '/login' :
+      // '/login' ,
       '/create-shipment',
      /* redirect: (context, state) {
         final auth = Provider.of<AuthState>(context, listen: false);
@@ -85,7 +93,7 @@ class _MyAppState extends State<MyApp> {
               },
             ),
             GoRoute(
-                path: '/shipments-list',
+                path: '/shipment-list',
                 builder: (context, state) {
                   return const ShipmentList();
                 },
@@ -100,7 +108,13 @@ class _MyAppState extends State<MyApp> {
                 ]
             ),
             GoRoute(
-              path: '/customers-list',
+              path: '/settings',
+              builder: (context,state){
+                return const SettingsPage();
+              }
+            ),
+            GoRoute(
+              path: '/customer-list',
               builder: (context, state) {
                 return const CustomerList();
               },
@@ -110,6 +124,32 @@ class _MyAppState extends State<MyApp> {
                   //parentNavigatorKey: _rootNavigatorKey,
                   builder: (BuildContext context, GoRouterState state) {
                     return const CreateCustomerFormPage();
+                  },
+                ),
+                GoRoute(
+                  path: 'details/:id',
+                  //parentNavigatorKey: _rootNavigatorKey,
+                  builder: (BuildContext context, GoRouterState state) {
+                    String? id = state.pathParameters['id'];
+                    return  CreateCustomerFormPage(
+                      id: id,
+                    );
+                  },
+                ),
+
+              ],
+            ),
+            GoRoute(
+              path: '/user-list',
+              builder: (context, state) {
+                return const UserList();
+              },
+              routes: <RouteBase>[
+                GoRoute(
+                  path: 'create',
+                  //parentNavigatorKey: _rootNavigatorKey,
+                  builder: (BuildContext context, GoRouterState state) {
+                    return const CreateUserPage();
                   },
                 ),
               ],
@@ -135,28 +175,28 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: _router,
-      title: 'Golden Path Gate',
-      theme: ThemeData(
-        fontFamily: 'Cairo',
-        brightness: Brightness.light,
-        colorScheme: ColorScheme.light(
-          primary: AppColors.primary,
-          secondary: AppColors.secondary,
-          onPrimary: Colors.white,
-          onSecondary: Colors.white,
-          surface: AppColors.background,
-        ),
-        scaffoldBackgroundColor: Colors.white,//Colors.black,
-        // canvasColor: Colors.white12,
-        appBarTheme: AppBarTheme(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-        ),
+    return ChangeNotifierProvider<AppConfigService>.value(
+      value: AppConfigService(),
+      child: Consumer<AppConfigService>(
+        builder: (context, state, child) {
+          return MaterialApp.router(
+            routerConfig: _router,
+            title: 'Golden Path Gate',
+            theme: state.brightness == Brightness.light ? lightThemeDate : darkThemeDate,
+            localizationsDelegates: [
+              const AppLocalizationsDelegate(),
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              DefaultCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: Lang.values.map((e) => Locale(e)).toList(),
+            locale: Locale(
+              LocalStorageService.instance.languageCode,
+            ),
+          );
+        }
       ),
-      //home: MainAppWrapper(),
-      // home: const ShipmentFormPage()
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:golden_path_gate_admin_portal/constants.dart';
+import 'package:golden_path_gate_admin_portal/localization/AppLocal.dart';
 import 'package:golden_path_gate_admin_portal/models/shipment.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_list/shipmentsListProvider.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_list/widget/filter_shipments.dart';
@@ -42,10 +43,10 @@ class _ShipmentListState extends State<ShipmentList> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Shipments List",
+                        AppLocalizations.of(context).trans("shipmentsList"),
                         style: TextStyle(
                             fontSize: 32,
-                            color: AppColors.primary,
+                            color: Theme.of(context).primaryColor,
                             fontWeight: FontWeight.bold
                         ),
                       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:golden_path_gate_admin_portal/constants.dart';
 import 'package:golden_path_gate_admin_portal/models/customer.dart';
 
@@ -16,17 +17,16 @@ class _CustomerCardState extends State<CustomerCard> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (value){
+    return InkWell(
+      onTap: (){
+        context.go('/customer-list/details/${widget.customer.uid}');
+      },
+      onHover: (value){
         setState(() {
-          hovered = true;
+          hovered = value;
         });
       },
-      onExit: (value){
-        setState(() {
-          hovered = false;
-        });
-      },
+      borderRadius: BorderRadius.circular(kCornerRadius),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(kCornerRadius),
@@ -59,13 +59,16 @@ class _CustomerCardState extends State<CustomerCard> {
                 fontSize: 14,
               ),
             ),
-            Text(
-              widget.customer.email,
-              style: TextStyle(
-                fontWeight: FontWeight.normal,
-                fontSize: 14,
+            if(widget.customer.email != null)
+              Text(
+                widget.customer.email!,
+                style: TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
           ],
         ),
       ),

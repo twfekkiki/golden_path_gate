@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:golden_path_gate_admin_portal/constants.dart';
+import 'package:golden_path_gate_admin_portal/localization/AppLocal.dart';
 import 'package:golden_path_gate_admin_portal/models/shipment.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_details/shipment_details_provider.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_details/updatable_text_fields.dart';
@@ -44,12 +45,10 @@ class _ShipmentDetailsState extends State<ShipmentDetails> {
           }
 
           Shipment shipment = snapshot.shipment!;
-          print("New shipment");
-          print(shipment);
 
           return Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).canvasColor,
               borderRadius: BorderRadius.circular(kCornerRadius)
             ),
             padding: EdgeInsets.all(16),
@@ -63,7 +62,7 @@ class _ShipmentDetailsState extends State<ShipmentDetails> {
                   // _getTitle('Status details'),
                   FormWidgetContainer(
                     child: FormInputContainer(
-                      title: "Status Details",
+                      title: AppLocalizations.of(context).trans("statusDetails"),
                       isMainTitle: true,
                       child: ProcessTimelineWidget(
                         uid: widget.id,

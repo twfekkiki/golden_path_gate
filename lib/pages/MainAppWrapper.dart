@@ -39,7 +39,7 @@ class _MainAppWrapperState extends State<MainAppWrapper> {
   }
 
 
-  GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -47,9 +47,11 @@ class _MainAppWrapperState extends State<MainAppWrapper> {
           bool isMobile = constrains.maxWidth < kSmallSize;
           return Scaffold(
             key: _key,
-            backgroundColor: Colors.grey.shade200,
-            drawer: isMobile ? AppDrawer(opened: true,isSide: true, onChange: (value ) {
-              print("onChange");
+            backgroundColor:
+            Theme.of(context).brightness == Brightness.dark?
+            Colors.black: Colors.grey.shade200,
+            drawer: isMobile ?
+            AppDrawer(opened: true,isSide: true, onChange: (value ) {
               _key.currentState!.closeDrawer();
             }, selectedIndex: _getSelectedPage,) : null,
             drawerEnableOpenDragGesture: false,
@@ -61,11 +63,7 @@ class _MainAppWrapperState extends State<MainAppWrapper> {
                     opened: drawer,
                     selectedIndex: _getSelectedPage,
                     onChange: (index){
-                      print("onChange");
                       _key.currentState!.closeDrawer();
-                      // setState(() {
-                      //   selectedPage = index;
-                      // });
                     },
                   ),
                   const SizedBox(width: 16,),
@@ -109,15 +107,23 @@ class _MainAppWrapperState extends State<MainAppWrapper> {
   }
 
   int get _getSelectedPage {
+    print("_getSelectedPage");
     String basePage = widget.path.split('/')[1];
+    print(basePage);
     if(basePage == 'create-shipment'){
       return 0;
     }
-    if(basePage == 'shipments-list'){
+    if(basePage == 'shipment-list'){
       return 1;
     }
-    if(basePage == 'customers-list'){
+    if(basePage == 'customer-list'){
       return 2;
+    }
+    if(basePage == 'settings'){
+      return 3;
+    }
+    if(basePage == 'user-list'){
+      return 4;
     }
     return 0;
   }

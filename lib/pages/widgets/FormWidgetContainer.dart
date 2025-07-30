@@ -11,7 +11,7 @@ class FormWidgetContainer extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(kCornerRadius),
-        border: _getBorder,
+        border: _getBorder(context),
       ),
       padding: EdgeInsets.all(16),
       margin: EdgeInsets.only(
@@ -21,9 +21,11 @@ class FormWidgetContainer extends StatelessWidget {
     );
   }
 
-  get _getBorder{
+  _getBorder(BuildContext context) {
     return Border.all(
-      color: Colors.grey.shade300,
+      color:
+      Theme.of(context).brightness == Brightness.light ?
+          Colors.black12 : Colors.white24,
       width: 0.7,
     );
   }

@@ -20,7 +20,9 @@ class _HeaderState extends State<Header> {
     return Container(
       height: 70,
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: Theme.of(context).brightness == Brightness.light ?
+        Theme.of(context).primaryColor:
+        Colors.grey.shade900,
         borderRadius: BorderRadius.circular(kCornerRadius),
       ),
       padding: EdgeInsets.all(16),

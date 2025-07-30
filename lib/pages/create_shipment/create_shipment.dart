@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
+import 'package:golden_path_gate_admin_portal/localization/AppLocal.dart';
 import 'package:golden_path_gate_admin_portal/models/customer.dart';
 import 'package:golden_path_gate_admin_portal/models/shipment.dart';
+import 'package:golden_path_gate_admin_portal/models/shipment_status.dart';
 import 'package:golden_path_gate_admin_portal/pages/create_shipment/create_shipment_provider.dart';
 import 'package:golden_path_gate_admin_portal/pages/customers/select_customer_view.dart';
 import 'package:golden_path_gate_admin_portal/pages/widgets/FormInputContainer.dart';
 import 'package:golden_path_gate_admin_portal/pages/widgets/FormWidgetContainer.dart';
+import 'package:golden_path_gate_admin_portal/services/app_info_service.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 
@@ -24,6 +27,7 @@ class ShipmentFormPage extends StatefulWidget {
 
 class _ShipmentFormPageState extends State<ShipmentFormPage> {
   final CreateShipmentProvider createShipmentProvider = CreateShipmentProvider();
+  final AppInfoService appInfoServiceProvider = AppInfoService();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -43,12 +47,17 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
   String? _shipmentTransportType;
   String? _shipmentLoadType;
   String? _packagingType;
-  String? _shipmentServiceType;
+  int? _shipmentServiceType;
   Customer? _customer;
 
   List<ShipmentDimension> dimensions = [];
   List<String> hsCodes = [];
 
+  @override
+  void initState() {
+    appInfoServiceProvider.loadCreateShipmentData();
+    super.initState();
+  }
 
   void _createShipment() async {
     if (_formKey.currentState!.validate()) {
@@ -81,7 +90,7 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
       print(result);
 
       if(result != null && createShipmentProvider.done){
-        context.go('/shipments-list/details/$result');
+        context.go('/shipment-list/details/$result');
       }
     }
   }
@@ -89,67 +98,58 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
-      value: createShipmentProvider,
-      child: Scaffold(
-        // appBar: AppBar(
-        //   title: Text('Create Shipment'),
-        //   actions: [
-        //     IconButton(
-        //       icon: Icon(Icons.home),
-        //       onPressed: () {
-        //         // Navigate to home or another page
-        //         Navigator.pop(context);
-        //       },
-        //     ),
-        //   ],
-        // ),
-        backgroundColor: AppColors.background,
-        body: Consumer<CreateShipmentProvider>(
-          builder: (context,snapshot,child) {
-            return LayoutBuilder(
-              builder: (context,constrains) {
-
-                double canvasWidth = 700;
-                if(canvasWidth > constrains.maxWidth){
-                  canvasWidth = constrains.maxWidth;
-                }
-                double fieldWidth = ((canvasWidth - (16 + 16 + 36 + 2)) / 2)  ;
-                double minFieldWidth = ((canvasWidth - (16 + 16 + 60 + 2)) / 4)  ;
-                if(canvasWidth < 600){
-                  // canvasWidth = 600;
-                  fieldWidth = canvasWidth - 44;
-                  minFieldWidth = ((canvasWidth - (16 + 16 + 36 + 2)) / 2);
-                }
-
-                return ModalProgressHUD(
-                  inAsyncCall: snapshot.loading,
-                  progressIndicator: _progressIndicator,
-                  child: Form(
-                    key: _formKey,
-                    child: SingleChildScrollView(
-                      child: Center(
-                        child: Container(
-                          width: canvasWidth,
-                          margin: EdgeInsets.symmetric(
-                            vertical: 36,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.background,
-                            borderRadius: BorderRadius.circular(kCornerRadius),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black12,
-                                spreadRadius: 1,
-                                blurRadius: 5
-                              )
-                            ]
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                FormWidgetContainer(
+      value: appInfoServiceProvider,
+      child: ChangeNotifierProvider.value(
+        value: createShipmentProvider,
+        child: Scaffold(
+          backgroundColor: Theme.of(context).canvasColor,//AppColors.background,
+          body: Consumer2<AppInfoService,CreateShipmentProvider>(
+            builder: (context,appInfoService,snapshot,child) {
+              if(appInfoService.status == null){
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              return LayoutBuilder(
+                builder: (context,constrains) {
+                  double canvasWidth = 800;
+                  if(canvasWidth > constrains.maxWidth){
+                    canvasWidth = constrains.maxWidth;
+                  }
+                  double fieldWidth = ((canvasWidth - (16 + 16 + 36 + 2)) / 2)  ;
+                  double minFieldWidth = ((canvasWidth - (16 + 16 + 60 + 2)) / 4)  ;
+                  if(canvasWidth < 600){
+                    // canvasWidth = 600;
+                    fieldWidth = canvasWidth - 44;
+                    minFieldWidth = ((canvasWidth - (16 + 16 + 36 + 2)) / 2);
+                  }
+                  return ModalProgressHUD(
+                    inAsyncCall: snapshot.loading,
+                    progressIndicator: _progressIndicator,
+                    child: Form(
+                      key: _formKey,
+                      child: SingleChildScrollView(
+                        child: Center(
+                          child: Container(
+                            width: canvasWidth,
+                            margin: EdgeInsets.symmetric(vertical: 36),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).canvasColor,//AppColors.background,
+                              borderRadius: BorderRadius.circular(kCornerRadius),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                )
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  FormWidgetContainer(
                                     child: Wrap(
                                       direction: Axis.horizontal,
                                       crossAxisAlignment: WrapCrossAlignment.center,
@@ -157,24 +157,26 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                       runSpacing: 12,
                                       children: [
                                         SizedBox(
-                                          width:fieldWidth,
+                                          width: fieldWidth,
                                           child: FormInputContainer(
-                                            title: 'Form Number #',
+                                            title: AppLocalizations.of(context).trans("shipmentNumber"),
                                             child: TextFormField(
                                               controller: _shipmentNumberController,
                                               cursorHeight: 16,
                                               cursorWidth: 2,
                                               decoration: getInputDecoration(
-                                                hint: '#123000555',
+                                                hint: AppLocalizations.of(context).trans("shipmentNumberHint"),
                                               ),
-                                              validator: (value) => value == null || value.isEmpty ? 'Please enter a shipment number' : null,
+                                              validator: (value) => value == null || value.isEmpty
+                                                  ? AppLocalizations.of(context).trans("shipmentNumberValidation")
+                                                  : null,
                                             ),
                                           ),
                                         ),
                                         SizedBox(
-                                          width:fieldWidth,
+                                          width: fieldWidth,
                                           child: FormInputContainer(
-                                            title: 'Customer',
+                                            title: AppLocalizations.of(context).trans("customer"),
                                             child: TextFormField(
                                               controller: _customerNameController,
                                               cursorHeight: 16,
@@ -182,64 +184,87 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                               readOnly: true,
                                               onTap: () async {
                                                 var result = await SelectCustomerView.show(context);
-                                                if(result != null){
+                                                if (result != null) {
                                                   _customer = (result as Customer);
                                                   _customerNameController.text = _customer!.fullName;
                                                 }
                                               },
                                               decoration: getInputDecoration(
-                                                hint: 'click to select',
+                                                hint: AppLocalizations.of(context).trans("clickToSelect"),
                                               ),
-                                              validator: (value) => value == null || value.isEmpty ? 'Please select a customer' : null,
+                                              validator: (value) => value == null || value.isEmpty
+                                                  ? AppLocalizations.of(context).trans("pleaseSelectCustomer")
+                                                  : null,
                                             ),
                                           ),
                                         ),
                                         SizedBox(
-                                          width:fieldWidth,
+                                          width: fieldWidth,
                                           child: FormInputContainer(
-                                            title: 'Shipment Transport Type',
+                                            title: AppLocalizations.of(context).trans("shipmentTransportType"),
                                             child: DropdownButtonFormField<String>(
                                               value: _shipmentTransportType,
                                               decoration: getInputDecoration(
-                                                hint: 'Air, Land, Sea',
+                                                hint: AppLocalizations.of(context).trans("airLandSea"),
                                               ),
-                                              style: TextStyle(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w400
-                                              ),
+                                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
                                               items: TransportType.values
-                                                  .map((type) => DropdownMenuItem(value: type, child: Text(type,style: TextStyle(fontSize: 12,color: Colors.black),)))
-                                                  .toList(),
-                                              onChanged: (value) => setState(() => _shipmentTransportType = value),
-                                              validator: (value) => value == null ? 'Please select a transport type' : null,
+                                                  .map(
+                                                      (type) => DropdownMenuItem(
+                                                        value: type,
+                                                        child: Text(
+                                                            AppLocalizations.of(context).trans(type),
+                                                            style: TextStyle(fontSize: 12, color: Colors.black)
+                                                        ),
+                                                      )).toList(),
+                                              onChanged: (value) =>
+                                                  setState(() => _shipmentTransportType = value),
+                                              validator: (value) => value == null
+                                                  ? AppLocalizations.of(context)
+                                                  .trans("pleaseSelectTransportType")
+                                                  : null,
                                             ),
                                           ),
                                         ),
                                         SizedBox(
-                                          width:fieldWidth,
+                                          width: fieldWidth,
                                           child: FormInputContainer(
-                                            title: 'Shipment Service Type',
-                                            child: DropdownButtonFormField<String>(
+                                            title: AppLocalizations.of(context).trans("shipmentServiceType"),
+                                            child: DropdownButtonFormField<int>(
                                               value: _shipmentServiceType,
+                                              isExpanded:true,
                                               decoration: getInputDecoration(
-                                                hint: 'Port to Port, Warehouse to Port',
+                                                hint: AppLocalizations.of(context)
+                                                    .trans("portToPortWarehouseToPort"),
                                               ),
-                                              style: TextStyle(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w400
-                                              ),
-                                              items: ShipmentServiceType.values
-                                                  .map((type) => DropdownMenuItem(value: type, child: Text(type,style: TextStyle(fontSize: 12,color: Colors.black),)))
-                                                  .toList(),
-                                              onChanged: (value) => setState(() => _shipmentServiceType = value),
-                                              validator: (value) => value == null ? 'Please select a service type' : null,
+                                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+                                              items: appInfoService.shipmentServices!
+                                                  .map(
+                                                      (type) => DropdownMenuItem(
+                                                        value: type.index,
+                                                        child: Text(
+                                                            type.name,
+                                                            style: TextStyle(
+                                                                fontSize: 12,
+                                                                color: Colors.black,
+                                                            ),
+                                                          maxLines: 2,
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                      )).toList(),
+                                              onChanged: (value) =>
+                                                  setState(() => _shipmentServiceType = value),
+                                              validator: (value) => value == null
+                                                  ? AppLocalizations.of(context)
+                                                  .trans("pleaseSelectServiceType")
+                                                  : null,
                                             ),
                                           ),
                                         ),
                                       ],
-                                    )
-                                ),
-                                FormWidgetContainer(
+                                    ),
+                                  ),
+                                  FormWidgetContainer(
                                     child: Wrap(
                                       direction: Axis.horizontal,
                                       crossAxisAlignment: WrapCrossAlignment.center,
@@ -247,51 +272,61 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                       runSpacing: 12,
                                       children: [
                                         SizedBox(
-                                          width:fieldWidth,
+                                          width: fieldWidth,
                                           child: FormInputContainer(
-                                            title: 'Sender Info',
+                                            title: AppLocalizations.of(context).trans("senderInfo"),
                                             child: TextFormField(
                                               controller: _senderInfoController,
-                                              decoration: getInputDecoration(hint: 'Trading company..'),
+                                              decoration: getInputDecoration(
+                                                  hint: AppLocalizations.of(context).trans("tradingCompany")),
                                               maxLines: 3,
                                               cursorHeight: 16,
                                               cursorWidth: 2,
-                                              validator: (value) => value == null || value.isEmpty ? 'Please enter sender info' : null,
+                                              validator: (value) => value == null || value.isEmpty
+                                                  ? AppLocalizations.of(context).trans("pleaseEnterSenderInfo")
+                                                  : null,
                                             ),
                                           ),
                                         ),
                                         SizedBox(
-                                          width:fieldWidth,
+                                          width: fieldWidth,
                                           child: FormInputContainer(
-                                            title: 'Receiver Info',
+                                            title: AppLocalizations.of(context).trans("receiverInfo"),
                                             child: TextFormField(
                                               controller: _receiverInfoController,
-                                              decoration: getInputDecoration(hint: 'Trading company..'),
+                                              decoration: getInputDecoration(
+                                                  hint: AppLocalizations.of(context).trans("tradingCompany")),
                                               maxLines: 3,
                                               cursorHeight: 16,
                                               cursorWidth: 2,
-                                              validator: (value) => value == null || value.isEmpty ? 'Please enter receiver info' : null,
+                                              validator: (value) => value == null || value.isEmpty
+                                                  ? AppLocalizations.of(context).trans("pleaseEnterReceiverInfo")
+                                                  : null,
                                             ),
                                           ),
                                         ),
                                         SizedBox(
-                                          width:fieldWidth,
+                                          width: fieldWidth,
                                           child: FormInputContainer(
-                                            title: 'Shipping Line',
+                                            title: AppLocalizations.of(context).trans("shippingLine"),
                                             child: TextFormField(
                                               controller: _shippingCompanyController,
-                                              decoration: getInputDecoration(hint: 'Shipping line name..'),
+                                              decoration: getInputDecoration(
+                                                  hint: AppLocalizations.of(context).trans("shippingLineName")),
                                               maxLines: 3,
                                               cursorHeight: 16,
                                               cursorWidth: 2,
-                                              validator: (value) => value == null || value.isEmpty ? 'Please enter shipping line name' : null,
+                                              validator: (value) => value == null || value.isEmpty
+                                                  ? AppLocalizations.of(context)
+                                                  .trans("pleaseEnterShippingLineName")
+                                                  : null,
                                             ),
                                           ),
                                         ),
                                       ],
-                                    )
-                                ),
-                                FormWidgetContainer(
+                                    ),
+                                  ),
+                                  FormWidgetContainer(
                                     child: Wrap(
                                       direction: Axis.horizontal,
                                       crossAxisAlignment: WrapCrossAlignment.start,
@@ -299,131 +334,131 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                       runSpacing: 12,
                                       children: [
                                         SizedBox(
-                                          width:fieldWidth,
+                                          width: fieldWidth,
                                           child: FormInputContainer(
-                                            title: 'Shipment Load Type',
+                                            title: AppLocalizations.of(context).trans("shipmentLoadType"),
                                             child: DropdownButtonFormField<String>(
                                               value: _shipmentLoadType,
-                                              style: TextStyle(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w400
+                                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+                                              decoration: getInputDecoration(
+                                                hint: AppLocalizations.of(context).trans("shipmentLoadType"),
                                               ),
-                                              decoration: getInputDecoration(hint: 'Shipment load type'),
                                               items: shipmentLoadTypes
                                                   .map((type) => DropdownMenuItem(value: type, child: Text(type)))
                                                   .toList(),
-                                              onChanged: (value) => setState(() => _shipmentLoadType = value),
-                                              // validator: (value) => value == null ? 'Please select a load type' : null,
+                                              onChanged: (value) =>
+                                                  setState(() => _shipmentLoadType = value),
                                             ),
                                           ),
                                         ),
                                         SizedBox(
-                                          width:fieldWidth,
+                                          width: fieldWidth,
                                           child: FormInputContainer(
-                                            title: 'Packaging Type',
+                                            title: AppLocalizations.of(context).trans("packagingType"),
                                             child: DropdownButtonFormField<String>(
                                               value: _packagingType,
-                                              decoration: getInputDecoration(hint: 'Packaging type'),
-                                              style: TextStyle(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w400
+                                              decoration: getInputDecoration(
+                                                hint: AppLocalizations.of(context).trans("packagingType"),
                                               ),
+                                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
                                               items: PackagingType.values
                                                   .map((type) => DropdownMenuItem(value: type, child: Text(type)))
                                                   .toList(),
-                                              onChanged: (value) => setState(() => _packagingType = value),
-                                              // validator: (value) => value == null ? 'Please select a packaging type' : null,
+                                              onChanged: (value) =>
+                                                  setState(() => _packagingType = value),
                                             ),
                                           ),
                                         ),
                                         SizedBox(
-                                          width:minFieldWidth,
+                                          width: minFieldWidth,
                                           child: FormInputContainer(
-                                            title: 'Pieces Count',
+                                            title: AppLocalizations.of(context).trans("piecesCount"),
                                             child: TextFormField(
                                               controller: _piecesCountController,
-                                              decoration: getInputDecoration(hint: 'Pieces Count'),
+                                              decoration: getInputDecoration(
+                                                hint: AppLocalizations.of(context).trans("piecesCount"),
+                                              ),
                                               keyboardType: TextInputType.number,
                                               cursorHeight: 16,
                                               cursorWidth: 2,
-                                              // validator: (value) => value == null || value.isEmpty ? 'Please enter pieces count' : null,
                                             ),
                                           ),
                                         ),
                                         SizedBox(
-                                          width:minFieldWidth,
+                                          width: minFieldWidth,
                                           child: FormInputContainer(
-                                            title: 'Gross Weight',
+                                            title: AppLocalizations.of(context).trans("grossWeight"),
                                             child: TextFormField(
                                               controller: _grossWeightController,
-                                              decoration: getInputDecoration(hint: 'Gross Weight'),
+                                              decoration: getInputDecoration(
+                                                hint: AppLocalizations.of(context).trans("grossWeight"),
+                                              ),
                                               keyboardType: TextInputType.number,
                                               cursorHeight: 16,
                                               cursorWidth: 2,
-                                              // validator: (value) => value == null || value.isEmpty ? 'Please enter gross weight' : null,
                                             ),
                                           ),
                                         ),
                                         SizedBox(
-                                          width:minFieldWidth,
+                                          width: minFieldWidth,
                                           child: FormInputContainer(
-                                            title: 'Chargeable Weight',
+                                            title: AppLocalizations.of(context).trans("chargeableWeight"),
                                             child: TextFormField(
                                               controller: _chargeableWeightController,
-                                              decoration: getInputDecoration(hint: 'Chargeable Weight'),
+                                              decoration: getInputDecoration(
+                                                hint: AppLocalizations.of(context).trans("chargeableWeight"),
+                                              ),
                                               keyboardType: TextInputType.number,
                                               cursorHeight: 16,
                                               cursorWidth: 2,
-                                              // validator: (value) => value == null || value.isEmpty ? 'Please enter chargeable weight' : null,
                                             ),
                                           ),
                                         ),
                                         SizedBox(
-                                          width:minFieldWidth,
+                                          width: minFieldWidth,
                                           child: FormInputContainer(
-                                            title: 'CBM',
+                                            title: AppLocalizations.of(context).trans("cbm"),
                                             child: TextFormField(
                                               controller: _cbmController,
-                                              decoration: getInputDecoration(hint: '12'),
+                                              decoration: getInputDecoration(
+                                                hint: AppLocalizations.of(context).trans("cbmHint"),
+                                              ),
                                               keyboardType: TextInputType.number,
                                               cursorHeight: 16,
                                               cursorWidth: 2,
-                                              // validator: (value) => value == null || value.isEmpty ? 'Please enter CBM' : null,
                                             ),
                                           ),
                                         ),
                                         SizedBox(
                                           width: fieldWidth,
                                           child: FormInputContainer(
-                                            title: 'Dimensions',
+                                            title: AppLocalizations.of(context).trans("dimensions"),
                                             child: ShipmentDimensionsField(
-                                              onSaved: (value){
-                                                dimensions = value??[];
+                                              onSaved: (value) {
+                                                dimensions = value ?? [];
                                               },
-                                              validator: (value){
+                                              validator: (value) {
                                                 return ShipmentDimensionsField.validateDimensions(value);
                                               },
-                                            )
+                                            ),
                                           ),
                                         ),
                                         SizedBox(
                                           width: fieldWidth,
                                           child: FormInputContainer(
-                                            title: 'HS Code',
+                                            title: AppLocalizations.of(context).trans("hsCode"),
                                             child: HSCodeListField(
-                                              onSaved: (value){
+                                              onSaved: (value) {
                                                 hsCodes = value ?? [];
                                               },
-                                              validator: (value){
-
-                                              },
+                                              // validator: (value) {},
                                             ),
                                           ),
                                         ),
                                       ],
-                                    )
-                                ),
-                                FormWidgetContainer(
+                                    ),
+                                  ),
+                                  FormWidgetContainer(
                                     child: Wrap(
                                       direction: Axis.horizontal,
                                       crossAxisAlignment: WrapCrossAlignment.start,
@@ -433,21 +468,22 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                         SizedBox(
                                           width: canvasWidth,
                                           child: FormInputContainer(
-                                              title: 'Notes',
-                                              child: TextFormField(
-                                                controller: _noteController,
-                                                decoration: getInputDecoration(hint: 'Notes about the shipment'),
-                                                maxLines: 3,
-                                                cursorHeight: 16,
-                                                cursorWidth: 2,
-                                                // validator: (value) => value == null || value.isEmpty ? 'Please enter the note' : null,
+                                            title: AppLocalizations.of(context).trans("notes"),
+                                            child: TextFormField(
+                                              controller: _noteController,
+                                              decoration: getInputDecoration(
+                                                hint: AppLocalizations.of(context).trans("notesAboutShipment"),
                                               ),
+                                              maxLines: 3,
+                                              cursorHeight: 16,
+                                              cursorWidth: 2,
+                                            ),
                                           ),
                                         )
                                       ],
-                                    )
-                                ),
-                                FormWidgetContainer(
+                                    ),
+                                  ),
+                                  FormWidgetContainer(
                                     child: Wrap(
                                       direction: Axis.horizontal,
                                       crossAxisAlignment: WrapCrossAlignment.start,
@@ -457,62 +493,59 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                         SizedBox(
                                           width: canvasWidth,
                                           child: FormInputContainer(
-                                            title: 'Attachments',
+                                            title: AppLocalizations.of(context).trans("attachments"),
                                             child: AttachmentsArea(),
                                           ),
                                         )
                                       ],
-                                    )
-                                ),
-                                SizedBox(height: 20),
-                                ElevatedButton(
-                                  onPressed: _createShipment,
-                                  style: ElevatedButton.styleFrom(
+                                    ),
+                                  ),
+                                  SizedBox(height: 20),
+                                  ElevatedButton(
+                                    onPressed: _createShipment,
+                                    style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.secondary,
                                       foregroundColor: Colors.white,
                                       elevation: 1,
                                       shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(kCornerRadius)
-                                      )
-                                  ),
-                                  child: Text('Create Shipment'),
-                                ),
-                                if(snapshot.error != null)
-                                  Center(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.red.shade50,
                                         borderRadius: BorderRadius.circular(kCornerRadius),
-                                        border: Border.all(
-                                          color: Colors.black
-                                        )
                                       ),
-                                      padding: EdgeInsets.all(16),
-                                      margin: EdgeInsets.symmetric(
-                                        vertical: 12
-                                      ),
-                                      child: Text(
-                                        'error with the error in the error but erroring the error need more errors to error the thing out of the error zone!',
-                                        // snapshot.error.toString(),
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.red,
-                                          fontWeight: FontWeight.w600
+                                    ),
+                                    child: Text(AppLocalizations.of(context).trans("createShipment")),
+                                  ),
+                                  if (snapshot.error != null)
+                                    Center(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.shade50,
+                                          borderRadius: BorderRadius.circular(kCornerRadius),
+                                          border: Border.all(color: Colors.black),
+                                        ),
+                                        padding: EdgeInsets.all(16),
+                                        margin: EdgeInsets.symmetric(vertical: 12),
+                                        child: Text(
+                                          AppLocalizations.of(context).trans("errorSample"),
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  )
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              }
-            );
-          }
+                  );
+
+                }
+              );
+            }
+          ),
         ),
       ),
     );
@@ -529,28 +562,28 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
       border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(kCornerRadius),
           borderSide: BorderSide(
-              color: Colors.black12,
+              color: Theme.of(context).brightness == Brightness.light ? Colors.black12 : Colors.white12,
               width: 0.8
           )
       ),
       enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(kCornerRadius),
           borderSide: BorderSide(
-              color: Colors.black12,
+              color: Theme.of(context).brightness == Brightness.light ? Colors.black12 : Colors.white12,
               width: 0.8
           )
       ),
       disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(kCornerRadius),
           borderSide: BorderSide(
-              color: Colors.black12,
+              color: Theme.of(context).brightness == Brightness.light ? Colors.black12 : Colors.white12,
               width: 0.8
           )
       ),
       focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(kCornerRadius),
           borderSide: BorderSide(
-              color: AppColors.primary,
+              color: Theme.of(context).brightness == Brightness.light ? Colors.black12 : Colors.white12,
               width: 0.8
           )
       ),

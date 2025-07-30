@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:go_router/go_router.dart';
+import 'package:golden_path_gate_admin_portal/localization/AppLocal.dart';
 import 'package:golden_path_gate_admin_portal/models/customer.dart';
 import 'package:golden_path_gate_admin_portal/pages/widgets/FormInputContainer.dart';
 import 'package:golden_path_gate_admin_portal/pages/widgets/FormWidgetContainer.dart';
@@ -11,7 +13,8 @@ import '../../constants.dart';
 import 'create_customer_provider.dart';
 
 class CreateCustomerFormPage extends StatefulWidget {
-  const CreateCustomerFormPage({super.key});
+  final String? id;
+  const CreateCustomerFormPage({super.key, this.id});
 
   @override
   State<CreateCustomerFormPage> createState() => _CreateCustomerFormPageState();
@@ -22,27 +25,70 @@ class _CreateCustomerFormPageState extends State<CreateCustomerFormPage> {
   final CreateCustomerProvider createCustomerProvider = CreateCustomerProvider();
 
   // Controllers
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  late TextEditingController _firstNameController;
+  late TextEditingController _lastNameController;
+  late TextEditingController _companyNameController;
+  late TextEditingController _phoneController;
+  late TextEditingController _emailController;
+  late TextEditingController _usernameController;
+  late TextEditingController _passwordController;
 
+
+  @override
+  void initState() {
+   initControllers();
+    super.initState();
+  }
+
+  initControllers() async {
+    Customer? customer;
+    if(widget.id!=null && widget.id!.isNotEmpty){
+      customer = await createCustomerProvider.getCustomerDetails(widget.id!);
+    }
+    _firstNameController = TextEditingController(
+        text: customer?.firstName??""
+    );
+    _lastNameController = TextEditingController(
+        text: customer?.lastName??""
+    );
+    _companyNameController = TextEditingController(
+        text: customer?.companyName??""
+    );
+    _phoneController = TextEditingController(
+        text: customer?.phone??""
+    );
+    _emailController = TextEditingController(
+        text: customer?.email??""
+    );
+    _usernameController = TextEditingController(
+        text: customer?.userName??""
+    );
+    _passwordController = TextEditingController(
+        text: customer?.password??""
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((timestamp){
+      createCustomerProvider.initiate();
+    });
+  }
 
   void _createCustomer() async {
     if (_formKey.currentState!.validate()) {
       var result = await createCustomerProvider.createCustomer(
           Customer(
-              uid: '',
+              uid: widget.id??"",
               firstName: _firstNameController.text.trim(),
               lastName: _lastNameController.text.trim(),
               phone: _phoneController.text.trim(),
               email: _emailController.text.trim(),
               userName: _usernameController.text.trim(),
-              password: _passwordController.text.trim()
+              password: _passwordController.text.trim(),
+              companyName: _companyNameController.text.trim()
           )
       );
+      if (result != null){
+        context.go('/customer-list');
+      }
     }
   }
 
@@ -51,18 +97,6 @@ class _CreateCustomerFormPageState extends State<CreateCustomerFormPage> {
     return ChangeNotifierProvider<CreateCustomerProvider>.value(
       value: createCustomerProvider,
       child: Scaffold(
-        // appBar: AppBar(
-        //   title: Text('Create Shipment'),
-        //   actions: [
-        //     IconButton(
-        //       icon: Icon(Icons.home),
-        //       onPressed: () {
-        //         // Navigate to home or another page
-        //         Navigator.pop(context);
-        //       },
-        //     ),
-        //   ],
-        // ),
         backgroundColor: AppColors.background,
         body: Consumer<CreateCustomerProvider>(
           builder: (context,snapshot,child) {
@@ -80,6 +114,11 @@ class _CreateCustomerFormPageState extends State<CreateCustomerFormPage> {
                     minFieldWidth = ((canvasWidth - (16 + 16 + 36 + 2)) / 2);
                   }
 
+                  if(!snapshot.initiated){
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
                   return ModalProgressHUD(
                     inAsyncCall: snapshot.loading,
                     progressIndicator: _progressIndicator,
@@ -118,7 +157,7 @@ class _CreateCustomerFormPageState extends State<CreateCustomerFormPage> {
                                           SizedBox(
                                             width:fieldWidth,
                                             child: FormInputContainer(
-                                              title: 'First name',
+                                              title: AppLocalizations.of(context).trans("firstName"),
                                               child: TextFormField(
                                                 controller: _firstNameController,
                                                 cursorHeight: 16,
@@ -126,14 +165,14 @@ class _CreateCustomerFormPageState extends State<CreateCustomerFormPage> {
                                                 decoration: getInputDecoration(
                                                   hint: 'Ahmad ',
                                                 ),
-                                                validator: (value) => value == null || value.isEmpty ? 'Please enter the first name' : null,
+                                                validator: (value) => value == null || value.isEmpty ? AppLocalizations.of(context).trans("pleaseEnterTheFirstName") : null,
                                               ),
                                             ),
                                           ),
                                           SizedBox(
                                             width:fieldWidth,
                                             child: FormInputContainer(
-                                              title: 'Last name',
+                                              title: AppLocalizations.of(context).trans("lastName"),
                                               child: TextFormField(
                                                 controller: _lastNameController,
                                                 cursorHeight: 16,
@@ -141,7 +180,22 @@ class _CreateCustomerFormPageState extends State<CreateCustomerFormPage> {
                                                 decoration: getInputDecoration(
                                                   hint: 'Salem ',
                                                 ),
-                                                validator: (value) => value == null || value.isEmpty ? 'Please enter the last name' : null,
+                                                validator: (value) => value == null || value.isEmpty ? AppLocalizations.of(context).trans("pleaseEnterTheLastname") : null,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width:fieldWidth,
+                                            child: FormInputContainer(
+                                              title: AppLocalizations.of(context).trans("companyName"),
+                                              child: TextFormField(
+                                                controller: _companyNameController,
+                                                cursorHeight: 16,
+                                                cursorWidth: 2,
+                                                decoration: getInputDecoration(
+                                                  hint: AppLocalizations.of(context).trans("companyName"),
+                                                ),
+                                                // validator: (value) => value == null || value.isEmpty ? 'Please enter the last name' : null,
                                               ),
                                             ),
                                           ),
@@ -158,7 +212,7 @@ class _CreateCustomerFormPageState extends State<CreateCustomerFormPage> {
                                           SizedBox(
                                             width:fieldWidth,
                                             child: FormInputContainer(
-                                              title: 'phone number',
+                                              title: AppLocalizations.of(context).trans("phone"),
                                               child: TextFormField(
                                                 controller: _phoneController,
                                                 cursorHeight: 16,
@@ -166,14 +220,14 @@ class _CreateCustomerFormPageState extends State<CreateCustomerFormPage> {
                                                 decoration: getInputDecoration(
                                                   hint: '964750xxxxxxx ',
                                                 ),
-                                                validator: (value) => value == null || value.isEmpty ? 'Please enter the first name' : null,
+                                                validator: (value) => value == null || value.isEmpty ? AppLocalizations.of(context).trans("pleaseEnterThePhone") : null,
                                               ),
                                             ),
                                           ),
                                           SizedBox(
                                             width:fieldWidth,
                                             child: FormInputContainer(
-                                              title: 'Email',
+                                              title: AppLocalizations.of(context).trans("email"),
                                               child: TextFormField(
                                                 controller: _emailController,
                                                 cursorHeight: 16,
@@ -181,7 +235,7 @@ class _CreateCustomerFormPageState extends State<CreateCustomerFormPage> {
                                                 decoration: getInputDecoration(
                                                   hint: 'Salem ',
                                                 ),
-                                                validator: (value) => value == null || value.isEmpty ? 'Please enter the last name' : null,
+                                                validator: (value) => value == null || value.isEmpty ? AppLocalizations.of(context).trans("pleaseEnterTheEmail"): null,
                                               ),
                                             ),
                                           ),
@@ -199,7 +253,7 @@ class _CreateCustomerFormPageState extends State<CreateCustomerFormPage> {
                                           SizedBox(
                                             width:fieldWidth,
                                             child: FormInputContainer(
-                                              title: 'User name',
+                                              title: AppLocalizations.of(context).trans("username"),
                                               child: TextFormField(
                                                 controller: _usernameController,
                                                 cursorHeight: 16,
@@ -207,22 +261,22 @@ class _CreateCustomerFormPageState extends State<CreateCustomerFormPage> {
                                                 decoration: getInputDecoration(
                                                   hint: 'ahmad.salem ',
                                                 ),
-                                                validator: (value) => value == null || value.isEmpty ? 'Please enter the first name' : null,
+                                                validator: (value) => value == null || value.isEmpty ? AppLocalizations.of(context).trans("pleaseEnterTheUsername") : null,
                                               ),
                                             ),
                                           ),
                                           SizedBox(
                                             width:fieldWidth,
                                             child: FormInputContainer(
-                                              title: 'Password',
+                                              title: AppLocalizations.of(context).trans("password"),
                                               child: TextFormField(
                                                 controller: _passwordController,
                                                 cursorHeight: 16,
                                                 cursorWidth: 2,
                                                 decoration: getInputDecoration(
-                                                  hint: 'strong password ',
+                                                  hint: AppLocalizations.of(context).trans("strongPassword"),
                                                 ),
-                                                validator: (value) => value == null || value.isEmpty ? 'Please enter the last name' : null,
+                                                validator: (value) => (widget.id == null) && (value == null || value.isEmpty) ? AppLocalizations.of(context).trans("pleaseEnterThePassword") : null,
                                               ),
                                             ),
                                           ),
@@ -240,7 +294,10 @@ class _CreateCustomerFormPageState extends State<CreateCustomerFormPage> {
                                             borderRadius: BorderRadius.circular(kCornerRadius)
                                         )
                                     ),
-                                    child: Text('Create Customer'),
+                                    child: Text(
+                                      widget.id == null || widget.id!.isEmpty?
+                                        'Create customer':"Update customer"
+                                    ),
                                   ),
                                   if(snapshot.error != null)
                                     ErrorAppWidget(error: snapshot.error,)
@@ -315,7 +372,7 @@ class _CreateCustomerFormPageState extends State<CreateCustomerFormPage> {
         ),
         const SizedBox(height: 8,),
         Text(
-          "Creating Customer...",
+          "Working...",
           style: TextStyle(
               fontWeight: FontWeight.bold,
               color: AppColors.secondary,

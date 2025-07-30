@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:golden_path_gate_admin_portal/constants.dart';
+import 'package:golden_path_gate_admin_portal/localization/AppLocal.dart';
 import 'package:golden_path_gate_admin_portal/models/customer.dart';
 import 'package:golden_path_gate_admin_portal/pages/customers/widget/customer_card.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_list/widget/filter_shipments.dart';
@@ -57,25 +58,34 @@ class _SelectCustomerViewState extends State<SelectCustomerView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Customers List",
+                                  AppLocalizations.of(context).trans("customerList"),
                                   style: TextStyle(
                                       fontSize: 20,
                                       color: AppColors.primary,
                                       fontWeight: FontWeight.bold
                                   ),
                                 ),
-                                const SizedBox(width: 12,),
+                              ],
+                            ),
+                            Divider(
+                              height: 16,
+                              thickness: 0.1,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
                                 Expanded(
                                     child: FilterItem(
                                       onSubmit: (key , value ) {
                                         getCustomersListProvider.getCustomersList(searchKey: value);
                                       },
-                                      title: 'Search',
+                                      title: AppLocalizations.of(context).trans('search'),
                                       type: 'text-field',
                                       filterKey: 'customerName',
+                                      hint: AppLocalizations.of(context).trans("customerName"),
                                     )
                                 )
                               ],
@@ -83,22 +93,9 @@ class _SelectCustomerViewState extends State<SelectCustomerView> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16,),
                       Expanded(
                         child: LayoutBuilder(
                             builder: (context,constrains) {
-                              int rowChildCount = 4;
-                              // print(constrains.maxWidth);
-                              if(constrains.maxWidth < 820){
-                                rowChildCount = 3;
-                              }
-                              if(constrains.maxWidth < 620){
-                                rowChildCount = 2;
-                              }
-                              if(constrains.maxWidth < 420){
-                                rowChildCount = 1;
-                              }
-
                               return ListView.separated(
                                 padding: EdgeInsets.all(16),
                                 separatorBuilder: (context,index){
@@ -109,6 +106,7 @@ class _SelectCustomerViewState extends State<SelectCustomerView> {
                                       onTap: (){
                                         Navigator.of(context).pop(customers[index]);
                                       },
+                                      borderRadius: BorderRadius.circular(kCornerRadius),
                                       child: CustomerCard(customer: customers[index],));
                                 },
                                 itemCount: customers.length,

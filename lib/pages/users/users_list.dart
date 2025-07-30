@@ -2,44 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:golden_path_gate_admin_portal/constants.dart';
 import 'package:golden_path_gate_admin_portal/localization/AppLocal.dart';
-import 'package:golden_path_gate_admin_portal/models/customer.dart';
-import 'package:golden_path_gate_admin_portal/pages/customers/widget/customer_card.dart';
+import 'package:golden_path_gate_admin_portal/models/user.dart';
+import 'package:golden_path_gate_admin_portal/pages/users/widget/user_card.dart';
 import 'package:provider/provider.dart';
 
-import 'get_customers_list_provider.dart';
+import 'get_users_list_provider.dart';
 
-class CustomerList extends StatefulWidget {
-  const CustomerList({super.key});
+class UserList extends StatefulWidget {
+  const UserList({super.key});
 
   @override
-  State<CustomerList> createState() => _CustomerListState();
+  State<UserList> createState() => _UserListState();
 }
 
-class _CustomerListState extends State<CustomerList> {
+class _UserListState extends State<UserList> {
 
-  bool _showFilter = false;
-
-  final GetCustomersListProvider getCustomersListProvider = GetCustomersListProvider();
+  final GetUsersListProvider getCustomersListProvider = GetUsersListProvider();
 
 
   @override
   void initState() {
-    getCustomersListProvider.getCustomersList();
+    getCustomersListProvider.getUsersList();
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<GetCustomersListProvider>.value(
+    return ChangeNotifierProvider<GetUsersListProvider>.value(
       value: getCustomersListProvider,
       child: Scaffold(
-          body: Consumer<GetCustomersListProvider>(
+        backgroundColor: Theme.of(context).canvasColor,
+          body: Consumer<GetUsersListProvider>(
             builder: (context,snapshot,child) {
-              if(snapshot.customers == null){
+              if(snapshot.users == null){
                 return Center(
                   child: CircularProgressIndicator(),
                 );
               }
-              List<Customer> customers = snapshot.customers!;
+              List<PortalUser> users = snapshot.users!;
               return Column(
                 children: [
                   Container(
@@ -51,7 +50,7 @@ class _CustomerListState extends State<CustomerList> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              AppLocalizations.of(context).trans("customerList"),
+                              AppLocalizations.of(context).trans("userList"),
                               style: TextStyle(
                                   fontSize: 32,
                                   color: Theme.of(context).primaryColor,
@@ -67,29 +66,10 @@ class _CustomerListState extends State<CustomerList> {
                                   ),
                                   child: IconButton(
                                     onPressed: (){
-                                     context.go('/customer-list/create');
+                                     context.go('/user-list/create');
                                     },
                                     icon: Icon(
                                       Icons.add,
-                                      color: Colors.white,
-                                      size: 30,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12,),
-                                Container(
-                                  decoration: BoxDecoration(
-                                      color: AppColors.secondary,
-                                      shape: BoxShape.circle
-                                  ),
-                                  child: IconButton(
-                                    onPressed: (){
-                                      setState(() {
-                                        _showFilter = !_showFilter;
-                                      });
-                                    },
-                                    icon: Icon(
-                                      Icons.filter_alt_outlined,
                                       color: Colors.white,
                                       size: 30,
                                     ),
@@ -117,29 +97,41 @@ class _CustomerListState extends State<CustomerList> {
                   Expanded(
                     child: LayoutBuilder(
                       builder: (context,constrains) {
-                        int rowChildCount = 4;
-                        if(constrains.maxWidth < kLargeSize){
-                          rowChildCount = 3;
-                        }
-                        if(constrains.maxWidth < kMidSize){
-                          rowChildCount = 2;
-                        }
-                        if(constrains.maxWidth < kSmallSize){
-                          rowChildCount = 1;
-                        }
-
-                        return GridView.builder(
-                          padding: EdgeInsets.all(16),
-                          itemBuilder: (context,index){
-                            return CustomerCard(customer: customers[index],);
-                            },
-                          itemCount: customers.length,
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: rowChildCount,
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
-                            childAspectRatio: 2
-                          ),
+                        return Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16
+                              ),
+                              child: Row(
+                                children: [
+                                  _getHeader("UID"),
+                                  _getHeader(AppLocalizations.of(context).trans("username")),
+                                  _getHeader(AppLocalizations.of(context).trans("role")),
+                                  SizedBox(width: 80,height: 50,)
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: ListView.separated(
+                                padding: EdgeInsets.all(16),
+                                itemBuilder: (context,index){
+                                  return UserCard(
+                                    user: users[index],
+                                    onDelete: () {  },
+                                    onEdit: () {  },
+                                  );},
+                                itemCount: users.length,
+                                separatorBuilder: (BuildContext context, int index) {
+                                  return Divider(
+                                    height: 24,
+                                    color: Theme.of(context).dividerColor.withAlpha(100),
+                                    thickness: 0.8,
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         );
                       }
                     ),
@@ -149,6 +141,18 @@ class _CustomerListState extends State<CustomerList> {
             }
           )
       ),
+    );
+  }
+
+  _getHeader(String label){
+    return Expanded(
+        child: SelectableText(
+          label,
+          style: Theme.of(context).textTheme.headlineSmall!
+              .copyWith(
+              fontWeight: FontWeight.bold
+          ),
+        )
     );
   }
 }

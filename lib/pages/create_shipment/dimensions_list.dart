@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:golden_path_gate_admin_portal/constants.dart';
+import 'package:golden_path_gate_admin_portal/localization/AppLocal.dart';
 import 'package:golden_path_gate_admin_portal/models/shipment.dart';
 
 
@@ -124,7 +125,7 @@ class _DimensionsListState extends State<DimensionsList> {
                 children: [
                   Expanded(
                     child: Text(
-                      "P.count",
+                      AppLocalizations.of(context).trans("pCount"),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -135,7 +136,7 @@ class _DimensionsListState extends State<DimensionsList> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      "L",
+                      AppLocalizations.of(context).trans("lengthShort"),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -146,7 +147,7 @@ class _DimensionsListState extends State<DimensionsList> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      "W",
+                      AppLocalizations.of(context).trans("widthShort"),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -157,7 +158,7 @@ class _DimensionsListState extends State<DimensionsList> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      "H",
+                      AppLocalizations.of(context).trans("heightShort"),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
