@@ -3,13 +3,14 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:golden_path_gate_admin_portal/localization/AppLocal.dart';
 import 'package:golden_path_gate_admin_portal/models/customer.dart';
+import 'package:golden_path_gate_admin_portal/models/file_model.dart';
 import 'package:golden_path_gate_admin_portal/models/shipment.dart';
-import 'package:golden_path_gate_admin_portal/models/shipment_status.dart';
 import 'package:golden_path_gate_admin_portal/pages/create_shipment/create_shipment_provider.dart';
 import 'package:golden_path_gate_admin_portal/pages/customers/select_customer_view.dart';
 import 'package:golden_path_gate_admin_portal/pages/widgets/FormInputContainer.dart';
 import 'package:golden_path_gate_admin_portal/pages/widgets/FormWidgetContainer.dart';
 import 'package:golden_path_gate_admin_portal/services/app_info_service.dart';
+import 'package:golden_path_gate_admin_portal/services/firebase_storage_handler.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 
@@ -53,6 +54,8 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
   List<ShipmentDimension> dimensions = [];
   List<String> hsCodes = [];
 
+  List<FileModel> attachments = [];
+
   @override
   void initState() {
     appInfoServiceProvider.loadCreateShipmentData();
@@ -79,7 +82,8 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
         hsCodes: hsCodes.where((e) => e.isNotEmpty).toList(),
         note: _noteController.text.trim(),
         customerId: _customer!.uid,
-        customerName: _customer!.fullName
+        customerName: _customer!.fullName,
+        attachments:attachments,
       );
 
       // Process the shipment object as needed
@@ -89,7 +93,9 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
 
       print(result);
 
+
       if(result != null && createShipmentProvider.done){
+
         context.go('/shipment-list/details/$result');
       }
     }
@@ -491,15 +497,58 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                       runSpacing: 12,
                                       children: [
                                         SizedBox(
+                                          width: fieldWidth,
+                                          child: FormInputContainer(
+                                            title: AppLocalizations.of(context).trans("billOfLoading"),
+                                            child: SizedBox(
+                                              height: 200,
+                                              child: AttachmentsArea(
+                                                label: 'billOfLoading',
+                                                max: 1,
+                                                onChanged: (files){
+                                                  attachments.removeWhere((f) => f.label == 'billOfLoading');
+                                                  attachments.addAll(files);
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: fieldWidth,
+                                          child: FormInputContainer(
+                                            title: AppLocalizations.of(context).trans("invoice"),
+                                            child: SizedBox(
+                                              height: 200,
+                                              child: AttachmentsArea(
+                                                label: 'invoice',
+                                                max: 1,
+                                                onChanged: (files){
+                                                  attachments.removeWhere((f) => f.label == 'invoice');
+                                                  attachments.addAll(files);
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
                                           width: canvasWidth,
                                           child: FormInputContainer(
                                             title: AppLocalizations.of(context).trans("attachments"),
-                                            child: AttachmentsArea(),
+                                            child: SizedBox(
+                                              height: 200,
+                                              child: AttachmentsArea(
+                                                onChanged: (files){
+                                                  attachments.removeWhere((f) => f.label == null);
+                                                  attachments.addAll(files);
+                                                },
+                                              ),
+                                            ),
                                           ),
                                         )
                                       ],
                                     ),
                                   ),
+
                                   SizedBox(height: 20),
                                   ElevatedButton(
                                     onPressed: _createShipment,
@@ -607,7 +656,7 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
         ),
         const SizedBox(height: 8,),
         Text(
-          "Creating Shipment...",
+          AppLocalizations.of(context).trans("creatingShipment"),
           style: TextStyle(
               fontWeight: FontWeight.bold,
               color: AppColors.secondary,

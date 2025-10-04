@@ -17,16 +17,16 @@ class _CustomerCardState extends State<CustomerCard> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: (){
-        context.go('/customer-list/details/${widget.customer.uid}');
-      },
-      onHover: (value){
-        setState(() {
-          hovered = value;
-        });
-      },
-      borderRadius: BorderRadius.circular(kCornerRadius),
+    return SizedBox(
+      // onTap: (){
+      //   context.go('/customer-list/details/${widget.customer.uid}');
+      // },
+      // onHover: (value){
+      //   setState(() {
+      //     hovered = value;
+      //   });
+      // },
+      // borderRadius: BorderRadius.circular(kCornerRadius),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(kCornerRadius),

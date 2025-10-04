@@ -9,7 +9,7 @@ class ShipmentsListProvider extends ChangeNotifier {
   List<Shipment>? shipments;
 
   getShipmentsList() async {
-    var result = await _shipmentsCollection.limit(10).get();
+    var result = await _shipmentsCollection.orderBy('createdAt',descending: true).limit(10).get();
     shipments = List<Shipment>.of(result.docs.map((elements){return Shipment.fromDoc(elements);}));
     notifyListeners();
   }

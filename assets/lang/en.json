@@ -114,5 +114,10 @@
   "pickupDate": "Pickup Date",
   "origin": "Origin",
   "hub": "HUB",
-  "destinationPort": "Destination Port"
+  "destinationPort": "Destination Port",
+  "areYouSure": "Are you sure?",
+  "billOfLoading": "Bill of lading",
+  "invoice": "Invoice",
+  "creatingShipment": "Creating Shipment...",
+  "noMoreFiles": "No more files allowed!"
 }

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:golden_path_gate_admin_portal/models/shipment_status.dart';
-
+import 'package:intl/intl.dart' as intl;
 class AppInfoService extends ChangeNotifier{
 
   static final AppInfoService _instance = AppInfoService._internal();
@@ -35,7 +35,7 @@ class AppInfoService extends ChangeNotifier{
   }
 
 
-  getStatusName(int index){
+  getStatusName(int index,{DateTime? pickUpDate, String? origin, String? hub, String? destinationPort}){
     if(status == null){
       return "";
     }
@@ -44,7 +44,36 @@ class AppInfoService extends ChangeNotifier{
         return value.index == index;
       });
 
-      return statusModel.name;
+      String statusName = statusModel.name.
+      replaceAllMapped(RegExp(r'<(.*?)>'), (value){
+        String tag = statusModel.name
+            .substring(value.start,value.end);
+        switch(tag){
+          case "<pickupDate>":
+            final formater = intl.DateFormat("d-MM-y");
+            if(pickUpDate != null){
+              return formater.format(pickUpDate);
+            }
+            break;
+          case "<origin>":
+            if(origin != null){
+              return origin;
+            }
+            break;
+          case "<hub>":
+            if(hub != null){
+              return hub;
+            }
+            break;
+          case "<destinationPort>":
+            if(destinationPort != null){
+              return destinationPort;
+            }
+            break;
+        }
+        return '';
+      });
+      return statusName;
     } catch(error) {
       return "";
     }

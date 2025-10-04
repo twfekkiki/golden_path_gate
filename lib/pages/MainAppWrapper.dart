@@ -107,9 +107,7 @@ class _MainAppWrapperState extends State<MainAppWrapper> {
   }
 
   int get _getSelectedPage {
-    print("_getSelectedPage");
     String basePage = widget.path.split('/')[1];
-    print(basePage);
     if(basePage == 'create-shipment'){
       return 0;
     }

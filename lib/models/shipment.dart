@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:golden_path_gate_admin_portal/models/file_model.dart';
 import 'package:golden_path_gate_admin_portal/models/payment.dart';
 import 'package:golden_path_gate_admin_portal/models/shipment_status.dart';
 import 'package:intl/intl.dart' as intl;
@@ -108,6 +109,7 @@ class ShipmentCreateModel {
   final String note;
   final String customerName;
   final String customerId;
+  final List<FileModel> attachments;
   // final DateTime createdAt;
 
 
@@ -128,7 +130,8 @@ class ShipmentCreateModel {
     required this.hsCodes,
     required this.note,
     required this.customerId,
-    required this.customerName
+    required this.customerName,
+    required this.attachments
   });
 
   @override
@@ -156,7 +159,8 @@ class ShipmentCreateModel {
       "createdAt": FieldValue.serverTimestamp(),
       "status": 0,
       "customerName": customerName,
-      "customerId": customerId
+      "customerId": customerId,
+      "attachments": attachments.map((e) => e.toMap).toList()
       // "statusHistory":{
       //   "createdAt":FieldValue.serverTimestamp(),
       //   "note":note,
@@ -193,6 +197,7 @@ class Shipment {
   final DateTime? pickupDate;
   final String? hub;
   final String? destinationPort;
+  List<FileModel> attachments;
   // final List<ShipmentStatusHistory> statusHistory;
 
 
@@ -218,12 +223,12 @@ class Shipment {
     required this.note,
     required this.customerId,
     required this.customerName,
+    required this.attachments,
     this.payment,
     this.destinationPort,
     this.origin,
     this.pickupDate,
-    this.hub
-    // required this.statusHistory
+    this.hub,
   });
 
   factory Shipment.fromDoc(DocumentSnapshot doc){
@@ -257,7 +262,10 @@ class Shipment {
       origin: data['origin'],
       destinationPort: data['destinationPort'],
       hub: data['hub'],
-      pickupDate: data['pickupDate'] == null ? null : (data['pickupDate'] as Timestamp).toDate()
+      pickupDate: data['pickupDate'] == null ? null : (data['pickupDate'] as Timestamp).toDate(),
+      attachments: data['attachments'] == null ? [] : data['attachments'].map<FileModel>((value){
+        return FileModel.fromJson(value);
+      }).toList()
     );
   }
 
@@ -265,24 +273,6 @@ class Shipment {
   String toString() {
     return 'Shipment(transportType: $shipmentTransportType, number: $shipmentNumber, senderInfo: $senderInfo, receiverInfo: $receiverInfo, shippingCompany: $shippingCompany, loadType: $shipmentLoadType, packagingType: $packagingType, piecesCount: $piecesCount, grossWeight: $grossWeight, chargeableWeight: $chargeableWeight, cbm: $cbm)';
   }
-
-  /*Map<String, dynamic> get toMap {
-    return {
-      "shipmentNumber": shipmentNumber,
-      "shipmentTransportType": shipmentTransportType,
-      "senderInfo": senderInfo,
-      "receiverInfo": receiverInfo,
-      "shippingCompany": shippingCompany,
-      "shipmentLoadType": shipmentLoadType,
-      "packagingType": packagingType,
-      "piecesCount": piecesCount,
-      "grossWeight": grossWeight,
-      "chargeableWeight": chargeableWeight,
-      "cbm": cbm,
-      "hsCode": hsCodes,
-      "dimensions": dimensions.map((e){return e.toMap;}).toList(),
-    };
-  }*/
 }
 
 class ShipmentStatusHistory {

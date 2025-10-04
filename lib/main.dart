@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,14 +13,14 @@ import 'package:golden_path_gate_admin_portal/pages/shipment_details/shipment_de
 import 'package:golden_path_gate_admin_portal/pages/shipment_list/shipment_list.dart';
 import 'package:golden_path_gate_admin_portal/pages/users/users_list.dart';
 import 'package:golden_path_gate_admin_portal/services/app_config_service.dart';
+import 'package:golden_path_gate_admin_portal/services/app_info_service.dart';
 import 'package:golden_path_gate_admin_portal/services/local_storage_service.dart';
 import 'package:provider/provider.dart';
-import 'auth_service.dart';
-import 'constants.dart';
 import 'firebase_options.dart';
 import 'localization/AppLocal.dart';
 import 'pages/create_shipment/create_shipment.dart';
 import 'pages/users/create_user/create_user_page.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
@@ -32,7 +31,9 @@ GlobalKey<NavigatorState>(debugLabel: 'shell');
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await dotenv.load(fileName: ".env");
   LocalStorageService.instance.init();
+  AppInfoService();
   runApp(
       MyApp()
       // ChangeNotifierProvider.value(
@@ -192,7 +193,8 @@ class _MyAppState extends State<MyApp> {
             ],
             supportedLocales: Lang.values.map((e) => Locale(e)).toList(),
             locale: Locale(
-              LocalStorageService.instance.languageCode,
+              'ar'
+              //LocalStorageService.instance.languageCode,
             ),
           );
         }

@@ -13,8 +13,9 @@ import 'package:provider/provider.dart';
 
 class PaymentDetailsWidget extends StatefulWidget {
   final String uid;
+  final String userId;
   final ShipmentPayment? payment;
-  const PaymentDetailsWidget({super.key, required this.uid, required this.payment});
+  const PaymentDetailsWidget({super.key, required this.uid, required this.payment, required this.userId});
 
   @override
   State<PaymentDetailsWidget> createState() => _PaymentDetailsWidgetState();
@@ -32,7 +33,7 @@ class _PaymentDetailsWidgetState extends State<PaymentDetailsWidget> {
 
   @override
   void initState() {
-    shipmentPaymentProvider = ShipmentPaymentProvider(widget.uid);
+    shipmentPaymentProvider = ShipmentPaymentProvider(widget.uid,widget.userId);
     _isPayed = widget.payment?.isPayed ?? false;
     _selectedDate = widget.payment?.paymentDate ;
     _shipmentNoteController = TextEditingController(

@@ -46,8 +46,6 @@ class Customer {
     "userName": userName,
     if(email != null)
       "companyName": companyName,
-    if(uid.isEmpty)
-      "createdAt": FieldValue.serverTimestamp(),
     "password":password
   };
 

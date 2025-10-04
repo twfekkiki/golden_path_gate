@@ -48,20 +48,29 @@ class _ShipmentCardState extends State<ShipmentCard> {
               children: [
                 CardItem(title: AppLocalizations.of(context).trans("shipmentNumber"), value: widget.shipment!.shipmentNumber,),
                 CardItem(title: AppLocalizations.of(context).trans("customerName"), value: widget.shipment!.customerName,),
-                CardItem(title: AppLocalizations.of(context).trans('shipmentStatus'), value: _appInfoService.getStatusName(widget.shipment!.status).toUpperCase(),),
+                CardItem(
+                  title: AppLocalizations.of(context).trans('shipmentStatus'),
+                  value: _appInfoService.getStatusName(
+                    widget.shipment!.status,
+                    pickUpDate: widget.shipment!.pickupDate,
+                    origin: widget.shipment!.origin,
+                    destinationPort: widget.shipment!.destinationPort,
+                    hub: widget.shipment!.hub
+                  ).toUpperCase(),
+                ),
                 CardItem(title: AppLocalizations.of(context).trans('createdAt'), value: widget.shipment!.formatedDatetime,),
                 CardItem(title: AppLocalizations.of(context).trans('modifiedAt'), value: '25/6/2025',),
                 CardItem(title: AppLocalizations.of(context).trans('shipmentTransport'), value: widget.shipment!.shipmentTransportType,),
               ],
             ),
           ),
-          Positioned(
-            top: 0,
-            right: 0,
+          PositionedDirectional(
+            bottom: 0,
+            end: 0,
             child: Container(
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(kCornerRadius)
+                  borderRadius: BorderRadiusDirectional.only(
+                      topStart: Radius.circular(kCornerRadius)
                   ),
                   color: Colors.blue
               ),
@@ -81,9 +90,9 @@ class _ShipmentCardState extends State<ShipmentCard> {
             ),
           ),
           if(hovered)
-            Positioned(
-              bottom: 4,
-              right: 4,
+            PositionedDirectional(
+              top: 4,
+              end: 4,
               child: ElevatedButton(
                   onPressed: (){
                     context.go('/shipment-list/details/${widget.shipment!.uid}');
