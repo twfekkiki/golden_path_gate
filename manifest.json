@@ -1,6 +1,6 @@
 {
-    "name": "Golden Path Gate ",
-    "short_name": "GPG",
+    "name": "golden_path_gate_admin_portal",
+    "short_name": "golden_path_gate_admin_portal",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

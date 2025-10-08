@@ -29923,7 +29923,7 @@ $.ab.toString
 s=2
 return A.q(A.akK(A.bcv()),$async$ad_)
 case 2:s=3
-return A.q($.adq().yi(".env"),$async$ad_)
+return A.q($.adq().yi("assets/env.env"),$async$ad_)
 case 3:$.ad8().E6()
 $.ra()
 q=A.hT(new A.G5(null),A.aZq(),t.FB)
