@@ -147,7 +147,7 @@ class ProcessTimelineWidgetState extends State<ProcessTimelineWidget> {
                         ShipmentsDetailsProvider shipmentsDetailsProvider = Provider.of<ShipmentsDetailsProvider>(context,listen: false);
                         var result = await AddNewStageDialog.show(context,snapshot.statusHistory!.last.status);
                         if(result != null){
-                          await timelineProvider.changeStatus(result);
+                          await timelineProvider.changeStatus(result,shipmentsDetailsProvider.shipment!);
                           if(timelineProvider.done){
                             await shipmentsDetailsProvider.getShipmentsDetails();
                             timelineProvider.reset();

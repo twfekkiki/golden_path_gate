@@ -87,6 +87,7 @@ class NotificationsService {
     );
 
     log(url.toString());
+    print(topic);
 
     final message = {
       'message': {

@@ -64,7 +64,7 @@ class _ShipmentCardState extends State<ShipmentCard> {
               ],
             ),
           ),
-          PositionedDirectional(
+         /* PositionedDirectional(
             bottom: 0,
             end: 0,
             child: Container(
@@ -88,7 +88,7 @@ class _ShipmentCardState extends State<ShipmentCard> {
                 ),
               ),
             ),
-          ),
+          ),*/
           if(hovered)
             PositionedDirectional(
               top: 4,
@@ -101,6 +101,10 @@ class _ShipmentCardState extends State<ShipmentCard> {
                       foregroundColor: Colors.white,
                       backgroundColor: Color(0xff008000),
                       elevation: 0,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 16
+                      ),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5)
                       )

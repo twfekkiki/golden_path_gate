@@ -5,12 +5,14 @@ class FormInputContainer extends StatelessWidget {
   final String title;
   final Widget child;
   final bool isMainTitle;
+  final Widget? titleSide;
 
   const FormInputContainer({
     super.key,
     required this.title,
     required this.child,
     this.isMainTitle = false,
+    this.titleSide
   });
 
   @override
@@ -18,16 +20,23 @@ class FormInputContainer extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: isMainTitle ? 18 : 14,
-            color:
-                Theme.of(context).brightness == Brightness.light
-                    ? Theme.of(context).primaryColor
-                    : Colors.white,
-          ),
+        Row(
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: isMainTitle ? 18 : 14,
+                color:
+                    Theme.of(context).brightness == Brightness.light
+                        ? Theme.of(context).primaryColor
+                        : Colors.white,
+              ),
+            ),
+            const SizedBox(width: 16,),
+            if(titleSide != null)
+              titleSide!
+          ],
         ),
         const SizedBox(height: 8),
         child,

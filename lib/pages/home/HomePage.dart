@@ -11,12 +11,11 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
-        children: [
-          Container(
-            width: 100,
-          )
-        ],
+      body: Center(
+        child: SizedBox(
+          width: 300,
+          child: Image.asset('assets/icons/icon3.png'),
+        ),
       ),
     );
   }

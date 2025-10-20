@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:golden_path_gate_admin_portal/models/shipment.dart';
 import 'package:golden_path_gate_admin_portal/models/shipment_status.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_details/change_shipment_status_provider.dart';
+import 'package:golden_path_gate_admin_portal/services/app_info_service.dart';
 import 'package:golden_path_gate_admin_portal/services/notifications_service.dart';
 
 class ChangeStatusModel {
@@ -44,7 +45,7 @@ class TimelineProvider extends ChangeNotifier {
 
 
 
-  changeStatus(ChangeStatusModel request ) async {
+  changeStatus(ChangeStatusModel request,Shipment shipment ) async {
     try{
       loading = true;
       notifyListeners();
@@ -67,7 +68,11 @@ class TimelineProvider extends ChangeNotifier {
         });
       });
       var notificationService = NotificationsService();
-      notificationService.sendPushNotification(topic: customerId, title: "Shipment update", body: "Your shipment has a new status ${request.status}");
+      notificationService.sendPushNotification(
+          topic: customerId,
+          title: "Shipment #${shipment.shipmentNumber}",
+          body: "${ AppInfoService().getStatusName(request.status.index,pickUpDate: shipment.pickupDate) }"
+      );
       loading = false;
       done = true;
       notifyListeners();

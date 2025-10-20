@@ -80,7 +80,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - .env
+    - assets/env.env
     - assets/icons/
     - assets/lang/
     - secrets/key.json

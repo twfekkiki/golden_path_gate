@@ -10,9 +10,11 @@ import 'package:golden_path_gate_admin_portal/pages/shipment_details/widget/paym
 import 'package:golden_path_gate_admin_portal/pages/shipment_details/widget/timeline.dart';
 import 'package:golden_path_gate_admin_portal/pages/widgets/FormInputContainer.dart';
 import 'package:golden_path_gate_admin_portal/pages/widgets/FormWidgetContainer.dart';
+import 'package:golden_path_gate_admin_portal/pages/widgets/custom_app_button.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 
+import 'widget/attachments/attachment_section_details.dart';
 import 'widget/attachments/attachments_view.dart';
 
 class ShipmentDetails extends StatefulWidget {
@@ -82,59 +84,22 @@ class _ShipmentDetailsState extends State<ShipmentDetails> {
                           Row(
                             children: [
                               Expanded(
-                                child: FormInputContainer(
+                                child: AttachmentSectionDetails(
                                   title: AppLocalizations.of(
                                     context,
                                   ).trans("invoice"),
-                                  child: SizedBox(
-                                    height: 200,
-                                    child: AttachmentsArea(
-                                      label: 'invoice',
-                                      max: 1,
-                                      initialFiles:
-                                          shipment.attachments
-                                              .where(
-                                                (file) =>
-                                                    file.label == 'invoice',
-                                              )
-                                              .toList(),
-                                      onChanged: (files) {
-                                        attachments.removeWhere(
-                                          (f) => f.label == 'invoice',
-                                        );
-                                        attachments.addAll(files);
-                                      },
-                                    ),
-                                  ),
+                                  label: 'invoice',
+                                  shipment: shipment,
                                 ),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                child: FormInputContainer(
+                                child: AttachmentSectionDetails(
                                   title: AppLocalizations.of(
                                     context,
                                   ).trans("billOfLoading"),
-                                  child: SizedBox(
-                                    height: 200,
-                                    child: AttachmentsArea(
-                                      label: 'billOfLoading',
-                                      max: 1,
-                                      initialFiles:
-                                          shipment.attachments
-                                              .where(
-                                                (file) =>
-                                                    file.label ==
-                                                    'billOfLoading',
-                                              )
-                                              .toList(),
-                                      onChanged: (files) {
-                                        attachments.removeWhere(
-                                          (f) => f.label == 'billOfLoading',
-                                        );
-                                        attachments.addAll(files);
-                                      },
-                                    ),
-                                  ),
+                                  label: 'billOfLoading',
+                                  shipment: shipment,
                                 ),
                               ),
                             ],
@@ -142,25 +107,11 @@ class _ShipmentDetailsState extends State<ShipmentDetails> {
                           const SizedBox(height: 12),
                           SizedBox(
                             width: double.infinity,
-                            child: FormInputContainer(
+                            child: AttachmentSectionDetails(
                               title: AppLocalizations.of(
                                 context,
                               ).trans("attachments"),
-                              child: SizedBox(
-                                height: 200,
-                                child: AttachmentsArea(
-                                  initialFiles:
-                                      shipment.attachments
-                                          .where((file) => file.label == null)
-                                          .toList(),
-                                  onChanged: (files) {
-                                    attachments.removeWhere(
-                                      (f) => f.label == null,
-                                    );
-                                    attachments.addAll(files);
-                                  },
-                                ),
-                              ),
+                              shipment: shipment,
                             ),
                           ),
                         ],

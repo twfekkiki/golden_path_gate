@@ -110,8 +110,10 @@ class ShipmentCreateModel {
   final String customerName;
   final String customerId;
   final List<FileModel> attachments;
-  // final DateTime createdAt;
-
+  final String? origin;
+  final DateTime? pickupDate;
+  final String? hub;
+  final String? destinationPort;
 
   ShipmentCreateModel({
     required this.shipmentTransportType,
@@ -131,7 +133,11 @@ class ShipmentCreateModel {
     required this.note,
     required this.customerId,
     required this.customerName,
-    required this.attachments
+    required this.attachments,
+    required this.destinationPort,
+    required this.hub,
+    required this.origin,
+    required this.pickupDate
   });
 
   @override
@@ -160,7 +166,12 @@ class ShipmentCreateModel {
       "status": 0,
       "customerName": customerName,
       "customerId": customerId,
-      "attachments": attachments.map((e) => e.toMap).toList()
+      "attachments": attachments.map((e) => e.toMap).toList(),
+      "pickupDate": pickupDate,
+      "origin": origin,
+      "destinationPort": destinationPort,
+      "hub": hub,
+
       // "statusHistory":{
       //   "createdAt":FieldValue.serverTimestamp(),
       //   "note":note,

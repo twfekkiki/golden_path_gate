@@ -102,9 +102,10 @@ class _UpdatableTextFieldsState extends State<UpdatableTextFields> {
     _pickUpDate = widget.shipment.pickupDate;
   }
 
+  final dateFormatter = DateFormat("d-MMM-y");
+
   @override
   Widget build(BuildContext context) {
-    final dateFormatter = DateFormat("d-MMM-y");
     return ChangeNotifierProvider<UpdateShipmentDetailsProvider>.value(
       value: updateShipmentDetailsProvider,
       child: LayoutBuilder(
@@ -175,11 +176,19 @@ class _UpdatableTextFieldsState extends State<UpdatableTextFields> {
                                       foregroundColor: Colors.white,
                                       backgroundColor: Color(0xff008000),
                                       elevation: 0,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 16,
+                                        horizontal: 32
+                                      ),
                                       shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(5)
-                                      )
+                                      ),
                                   ),
-                                  child:
+                                  child: state.loading ? Center(
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    ),
+                                  ) :
 
                                   Text(
                                     AppLocalizations.of(context).trans("update"),

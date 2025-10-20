@@ -10,7 +10,8 @@ import 'package:golden_path_gate_admin_portal/pages/customers/select_customer_vi
 import 'package:golden_path_gate_admin_portal/pages/widgets/FormInputContainer.dart';
 import 'package:golden_path_gate_admin_portal/pages/widgets/FormWidgetContainer.dart';
 import 'package:golden_path_gate_admin_portal/services/app_info_service.dart';
-import 'package:golden_path_gate_admin_portal/services/firebase_storage_handler.dart';
+import 'package:golden_path_gate_admin_portal/theme.dart';
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 
@@ -43,6 +44,28 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
   final TextEditingController _chargeableWeightController = TextEditingController();
   final TextEditingController _cbmController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
+  final TextEditingController _originController = TextEditingController();
+  final TextEditingController _hubController = TextEditingController();
+  final TextEditingController _destinationPortController = TextEditingController();
+
+
+  @override
+  void dispose() {
+    _shipmentNumberController.dispose();
+    _customerNameController.dispose();
+    _senderInfoController.dispose();
+    _receiverInfoController.dispose();
+    _shippingCompanyController.dispose();
+    _piecesCountController.dispose();
+    _grossWeightController.dispose();
+    _chargeableWeightController.dispose();
+    _cbmController.dispose();
+    _noteController.dispose();
+    _originController.dispose();
+    _hubController.dispose();
+    _destinationPortController.dispose();
+    super.dispose();
+  }
 
   // Dropdown values
   String? _shipmentTransportType;
@@ -50,11 +73,16 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
   String? _packagingType;
   int? _shipmentServiceType;
   Customer? _customer;
+  DateTime? _pickUpDate;
+
 
   List<ShipmentDimension> dimensions = [];
   List<String> hsCodes = [];
 
   List<FileModel> attachments = [];
+
+  final dateFormatter = DateFormat("d-MMM-y");
+
 
   @override
   void initState() {
@@ -66,24 +94,28 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final shipment = ShipmentCreateModel(
-        shipmentTransportType: _shipmentTransportType!,
-        shipmentNumber: _shipmentNumberController.text,
-        senderInfo: _senderInfoController.text,
-        receiverInfo: _receiverInfoController.text,
-        shippingCompany: _shippingCompanyController.text,
-        shipmentLoadType: _shipmentLoadType,
-        packagingType: _packagingType!,
-        shipmentServiceType: _shipmentServiceType,
-        piecesCount: int.tryParse(_piecesCountController.text) ?? 0,
-        grossWeight: double.tryParse(_grossWeightController.text) ?? 0.0,
-        chargeableWeight: double.tryParse(_chargeableWeightController.text) ?? 0.0,
-        cbm: double.tryParse(_cbmController.text) ?? 0.0,
-        dimensions: dimensions.where((e) => !e.isEmpty).toList(),
-        hsCodes: hsCodes.where((e) => e.isNotEmpty).toList(),
-        note: _noteController.text.trim(),
-        customerId: _customer!.uid,
-        customerName: _customer!.fullName,
-        attachments:attachments,
+          shipmentTransportType: _shipmentTransportType!,
+          shipmentNumber: _shipmentNumberController.text,
+          senderInfo: _senderInfoController.text,
+          receiverInfo: _receiverInfoController.text,
+          shippingCompany: _shippingCompanyController.text,
+          shipmentLoadType: _shipmentLoadType,
+          packagingType: _packagingType!,
+          shipmentServiceType: _shipmentServiceType,
+          piecesCount: int.tryParse(_piecesCountController.text) ?? 0,
+          grossWeight: double.tryParse(_grossWeightController.text) ?? 0.0,
+          chargeableWeight: double.tryParse(_chargeableWeightController.text) ?? 0.0,
+          cbm: double.tryParse(_cbmController.text) ?? 0.0,
+          dimensions: dimensions.where((e) => !e.isEmpty).toList(),
+          hsCodes: hsCodes.where((e) => e.isNotEmpty).toList(),
+          note: _noteController.text.trim(),
+          customerId: _customer!.uid,
+          customerName: _customer!.fullName,
+          attachments:attachments,
+          destinationPort: _destinationPortController.text,
+          hub: _hubController.text,
+          pickupDate: _pickUpDate,
+          origin: _originController.text
       );
 
       // Process the shipment object as needed
@@ -173,6 +205,7 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                               decoration: getInputDecoration(
                                                 hint: AppLocalizations.of(context).trans("shipmentNumberHint"),
                                               ),
+                                              textDirection: TextDirection.ltr,
                                               validator: (value) => value == null || value.isEmpty
                                                   ? AppLocalizations.of(context).trans("shipmentNumberValidation")
                                                   : null,
@@ -184,6 +217,7 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                           child: FormInputContainer(
                                             title: AppLocalizations.of(context).trans("customer"),
                                             child: TextFormField(
+                                              textDirection: TextDirection.ltr,
                                               controller: _customerNameController,
                                               cursorHeight: 16,
                                               cursorWidth: 2,
@@ -282,6 +316,7 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                           child: FormInputContainer(
                                             title: AppLocalizations.of(context).trans("senderInfo"),
                                             child: TextFormField(
+                                              textDirection: TextDirection.ltr,
                                               controller: _senderInfoController,
                                               decoration: getInputDecoration(
                                                   hint: AppLocalizations.of(context).trans("tradingCompany")),
@@ -299,9 +334,9 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                           child: FormInputContainer(
                                             title: AppLocalizations.of(context).trans("receiverInfo"),
                                             child: TextFormField(
+                                              textDirection: TextDirection.ltr,
                                               controller: _receiverInfoController,
-                                              decoration: getInputDecoration(
-                                                  hint: AppLocalizations.of(context).trans("tradingCompany")),
+                                              decoration: getInputDecoration(hint: AppLocalizations.of(context).trans("tradingCompany")),
                                               maxLines: 3,
                                               cursorHeight: 16,
                                               cursorWidth: 2,
@@ -316,6 +351,7 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                           child: FormInputContainer(
                                             title: AppLocalizations.of(context).trans("shippingLine"),
                                             child: TextFormField(
+                                              textDirection: TextDirection.ltr,
                                               controller: _shippingCompanyController,
                                               decoration: getInputDecoration(
                                                   hint: AppLocalizations.of(context).trans("shippingLineName")),
@@ -331,6 +367,91 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                         ),
                                       ],
                                     ),
+                                  ),
+                                  FormWidgetContainer(
+                                      child: Wrap(
+                                        direction: Axis.horizontal,
+                                        crossAxisAlignment: WrapCrossAlignment.start,
+                                        spacing: 12,
+                                        runSpacing: 12,
+                                        children: [
+                                          SizedBox(
+                                            width: fieldWidth,
+                                            child: FormInputContainer(
+                                              title: AppLocalizations.of(context).trans('origin'),
+                                              child: TextFormField(
+                                                controller: _originController,
+                                                decoration: AppTheme.getInputDecoration(context,hint: AppLocalizations.of(context).trans("origin")),
+                                                maxLines: 3,
+                                                cursorHeight: 16,
+                                                cursorWidth: 2,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: fieldWidth,
+                                            child: FormInputContainer(
+                                              title: AppLocalizations.of(context).trans('hub'),
+                                              child: TextFormField(
+                                                controller: _hubController,
+                                                decoration: AppTheme.getInputDecoration(context,hint: AppLocalizations.of(context).trans("hub")),
+                                                maxLines: 3,
+                                                cursorHeight: 16,
+                                                cursorWidth: 2,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: fieldWidth,
+                                            child: FormInputContainer(
+                                              title: AppLocalizations.of(context).trans('destinationPort'),
+                                              child: TextFormField(
+                                                controller: _destinationPortController,
+                                                decoration: AppTheme.getInputDecoration(context,hint: AppLocalizations.of(context).trans("destinationPort")),
+                                                maxLines: 3,
+                                                cursorHeight: 16,
+                                                cursorWidth: 2,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: fieldWidth,
+                                            child: InkWell(
+                                              borderRadius: BorderRadius.circular(kCornerRadius),
+                                              onTap: () async {
+                                                DateTime? value = await showDatePicker(
+                                                    context: context,
+                                                    firstDate: DateTime.now().subtract(Duration(days: 30)),
+                                                    lastDate: DateTime.now().add(Duration(days: 500))
+                                                );
+                                                if(value != null) {
+                                                  _pickUpDate = value;
+                                                  setState(() {
+
+                                                  });
+                                                }
+                                              },
+                                              child: FormInputContainer(
+                                                title: AppLocalizations.of(context).trans('pickupDate'),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.symmetric(
+                                                      horizontal: 12
+                                                  ),
+                                                  child: Text(
+                                                    _pickUpDate == null ?
+                                                    AppLocalizations.of(context).trans("clickToSelect") :
+                                                    dateFormatter.format(_pickUpDate!),
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.w600,
+                                                        fontSize: 12
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
                                   ),
                                   FormWidgetContainer(
                                     child: Wrap(
@@ -380,6 +501,7 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                           child: FormInputContainer(
                                             title: AppLocalizations.of(context).trans("piecesCount"),
                                             child: TextFormField(
+                                              textDirection: TextDirection.ltr,
                                               controller: _piecesCountController,
                                               decoration: getInputDecoration(
                                                 hint: AppLocalizations.of(context).trans("piecesCount"),
@@ -395,6 +517,7 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                           child: FormInputContainer(
                                             title: AppLocalizations.of(context).trans("grossWeight"),
                                             child: TextFormField(
+                                              textDirection: TextDirection.ltr,
                                               controller: _grossWeightController,
                                               decoration: getInputDecoration(
                                                 hint: AppLocalizations.of(context).trans("grossWeight"),
@@ -410,6 +533,7 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                           child: FormInputContainer(
                                             title: AppLocalizations.of(context).trans("chargeableWeight"),
                                             child: TextFormField(
+                                              textDirection: TextDirection.ltr,
                                               controller: _chargeableWeightController,
                                               decoration: getInputDecoration(
                                                 hint: AppLocalizations.of(context).trans("chargeableWeight"),
@@ -425,6 +549,7 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                           child: FormInputContainer(
                                             title: AppLocalizations.of(context).trans("cbm"),
                                             child: TextFormField(
+                                              textDirection: TextDirection.ltr,
                                               controller: _cbmController,
                                               decoration: getInputDecoration(
                                                 hint: AppLocalizations.of(context).trans("cbmHint"),
@@ -548,7 +673,6 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
                                       ],
                                     ),
                                   ),
-
                                   SizedBox(height: 20),
                                   ElevatedButton(
                                     onPressed: _createShipment,
@@ -677,7 +801,6 @@ class _ShipmentFormPageState extends State<ShipmentFormPage> {
     }
     return ShipmentLoadType.airLines;
   }
-
 
 }
 

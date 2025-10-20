@@ -48,15 +48,14 @@ class _AttachmentsAreaState extends State<AttachmentsArea> {
             cursor: CursorType.auto,
             onCreated: (DropzoneViewController ctrl) => controller = ctrl,
             onDropFile: (DropzoneFileInterface file) async {
-              print("test");
               onFilesDropped(file);
             },
-            onLoaded: () {
-              print("onLoaded");
-            },
-            onError: (err) {
-              print(err);
-            },
+            // onLoaded: () {
+            //   print("onLoaded");
+            // },
+            // onError: (err) {
+            //   print(err);
+            // },
           ),
           if (((widget.initialFiles ?? <FileModel>[]) + files).isEmpty)
             Text("Drop files here"),
@@ -234,7 +233,6 @@ class _AttachmentsAreaState extends State<AttachmentsArea> {
           label: widget.label,
         ),
       );
-      print("files ${files.length}");
       setState(() {});
       widget.onChanged(files);
     }

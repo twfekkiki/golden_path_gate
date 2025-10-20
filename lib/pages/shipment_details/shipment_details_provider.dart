@@ -62,6 +62,12 @@ class ShipmentsDetailsProvider extends ChangeNotifier {
           attachments[i].path = attachmentsPaths[i];
         }
       }
+      final docRef = FirebaseFirestore.instance
+          .collection('shipments')
+          .doc(shipment!.uid);
+      await docRef.update({
+        'attachments': FieldValue.arrayUnion(attachments.map((element)=>element.toMap).toList()),
+      });
       shipment!.attachments.addAll(attachments);
       loading = false;
       notifyListeners();

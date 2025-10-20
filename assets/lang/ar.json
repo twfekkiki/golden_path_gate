@@ -119,6 +119,10 @@
   "billOfLoading": "بوليصة الشحن",
   "invoice": "الفاتورة",
   "creatingShipment": "يتم إنشاء الشحنة",
-  "noMoreFiles": "لا يمكن رفع المزيد من الملفات"
+  "noMoreFiles": "لا يمكن رفع المزيد من الملفات",
+  "publish": "رفع",
+  "cbmHint": "CBM"
+
+
 
 }

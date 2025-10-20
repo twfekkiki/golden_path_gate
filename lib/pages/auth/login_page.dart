@@ -181,13 +181,19 @@ class LoginPageState extends State<LoginPage> {
                                   elevation: 1,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(kCornerRadius)
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 16
                                   )
                                 ),
-                                child: state.loading ? Center(
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                  ),
-                                ) : Text('Login'),
+                                child: SizedBox(
+                                  //height: 40,
+                                  child: state.loading ? Center(
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    ),
+                                  ) : Text('Login'),
+                                )
                               ),
                               const SizedBox(height: 12,),
                               if(state.error != null)

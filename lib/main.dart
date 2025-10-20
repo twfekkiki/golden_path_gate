@@ -8,6 +8,7 @@ import 'package:golden_path_gate_admin_portal/pages/MainAppWrapper.dart';
 import 'package:golden_path_gate_admin_portal/pages/auth/login_page.dart';
 import 'package:golden_path_gate_admin_portal/pages/customers/create_customer.dart';
 import 'package:golden_path_gate_admin_portal/pages/customers/customer_list.dart';
+import 'package:golden_path_gate_admin_portal/pages/home/HomePage.dart';
 import 'package:golden_path_gate_admin_portal/pages/settings/settings_page.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_details/shipment_details.dart';
 import 'package:golden_path_gate_admin_portal/pages/shipment_list/shipment_list.dart';
@@ -16,6 +17,7 @@ import 'package:golden_path_gate_admin_portal/services/app_config_service.dart';
 import 'package:golden_path_gate_admin_portal/services/app_info_service.dart';
 import 'package:golden_path_gate_admin_portal/services/local_storage_service.dart';
 import 'package:provider/provider.dart';
+import 'auth_service.dart';
 import 'firebase_options.dart';
 import 'localization/AppLocal.dart';
 import 'pages/create_shipment/create_shipment.dart';
@@ -31,17 +33,17 @@ GlobalKey<NavigatorState>(debugLabel: 'shell');
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: "assets/env.env");
   LocalStorageService.instance.init();
   AppInfoService();
   runApp(
-      MyApp()
-      // ChangeNotifierProvider.value(
-      //     value: AuthState(),
-      //     child:
-      // )
+      ChangeNotifierProvider.value(
+          value: AuthState(),
+          child: MyApp()
+      )
   );
 }
+final authStateNotifier = AuthState() ;
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -58,26 +60,15 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     _router = GoRouter(
       navigatorKey: _rootNavigatorKey,
-      // refreshListenable: Provider.of<AuthState>(context),
-      initialLocation:
-      // FirebaseAuth.instance.currentUser == null ?
-      // '/login' ,
-      '/create-shipment',
-     /* redirect: (context, state) {
-        final auth = Provider.of<AuthState>(context, listen: false);
-        final loggedIn = auth.isLoggedIn;
+      refreshListenable: authStateNotifier,
+      // redirect: (context, state) {
+      //   final loggedIn = authStateNotifier.isLoggedIn;
+      //   final loggingIn = state.uri.toString() == '/login';
+      //   if (!loggedIn && !loggingIn) return '/login';
+      //   if (loggedIn && loggingIn) return '/';
+      //   return null;
+      // },
 
-        print("state.topRoute");
-        print(state.topRoute);
-        print(state.name);
-        print(state.path);
-        final loggingIn = state.topRoute!.name == '/login';
-
-        if (!loggedIn) return loggingIn ? null : '/login';
-        if (loggedIn && loggingIn) return '/create-shipment';
-
-        return null;
-      },*/
       routes: [
         ShellRoute(
           navigatorKey: _shellNavigatorKey,
@@ -87,6 +78,12 @@ class _MyAppState extends State<MyApp> {
             );
           },
           routes: [
+            GoRoute(
+              path: '/',
+              builder: (context, state) {
+                return const Homepage();
+              },
+            ),
             GoRoute(
               path: '/create-shipment',
               builder: (context, state) {
